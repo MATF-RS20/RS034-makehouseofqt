@@ -1,6 +1,6 @@
 #include "door.h"
 
-Door::Door(QLineF doorline):_doorline(doorline)
+Door::Door(QLineF doorline, float height, float thickness):_doorline(doorline),_height(height),_thickness(thickness)
 {
 
 }
@@ -15,7 +15,7 @@ void Door::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 
     QPen pen;
     pen.setColor(QColor(139,69,19));
-    pen.setWidthF(9);
+    pen.setWidthF(_thickness*40);
 
     painter->setPen(pen);
     painter->drawLine(_doorline);

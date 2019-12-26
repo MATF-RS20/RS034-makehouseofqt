@@ -1,6 +1,6 @@
 #include "window.h"
 
-Window::Window(QLineF windowline):_windowline(windowline)
+Window::Window(QLineF windowline, float height, float thickness):_windowline(windowline),_height(height),_thickness(thickness)
 {
 
 }
@@ -15,7 +15,7 @@ void Window::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
 
     QPen pen;
     pen.setColor(QColor(189,183,107));
-    pen.setWidthF(9);
+    pen.setWidthF(_thickness*40);
 
     painter->setPen(pen);
     painter->drawLine(_windowline);

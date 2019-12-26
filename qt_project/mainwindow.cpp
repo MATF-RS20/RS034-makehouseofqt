@@ -76,6 +76,5 @@ void MainWindow::reseting()
 {
     buttonReset    -> setEnabled(false);
     buttonComplete -> setEnabled(false);
-    statusBar      -> setText(tr("Please paint new Polygon"));
     update();
 }

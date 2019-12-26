@@ -10,7 +10,7 @@
 class Door: public QGraphicsLineItem
 {
 public:
-    Door(QLineF doorline);
+    Door(QLineF doorline, float height=2, float thickness=0.25);
 
     QLineF door();
 
@@ -22,6 +22,9 @@ public:
 private:
 
     QLineF _doorline;
+    float _height;
+    float _thickness;
+
 };
 
 #endif // DOOR_H

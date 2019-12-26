@@ -29,11 +29,18 @@ SOURCES += \
     drawingarea.cpp \
     door.cpp \
     window.cpp \
-    wall.cpp
+    wall.cpp \
+    inputdialog.cpp \
+    floor.cpp
 
 HEADERS += \
         mainwindow.h \
     drawingarea.h \
     door.h \
     window.h \
-    wall.h
+    wall.h \
+    inputdialog.h \
+    floor.h
+
+FORMS += \
+    inputdialog.ui

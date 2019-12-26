@@ -3,6 +3,7 @@
 DrawingArea::DrawingArea(QWidget *parent)
    : QWidget(parent)
 {
+    setFocusPolicy(Qt::StrongFocus);//stavljeno je iz razloga sto nece tastere da registruje dovoljno brzo
     start_exist =false;
     on_mouse = false;
     aviable_here_place_newPoint = true;
@@ -11,6 +12,11 @@ DrawingArea::DrawingArea(QWidget *parent)
     polygon_is_complited = false;
     chosen_door=false;
     chosen_window=false;
+    input_dialog=new InputDialog(this);
+    wall_height=2.0;
+    wall_thickness=0.25;
+    last_floor=0;
+
     setCursor(Qt::CrossCursor);
     pen_green.setWidth(3);
     pen_green.setStyle(Qt::DashLine);
@@ -27,6 +33,7 @@ DrawingArea::DrawingArea(QWidget *parent)
     first_line_style.setWidth(3);
     first_line_style.setStyle(Qt::DashDotDotLine);
     first_line_style.setColor(Qt::black);
+
     connect(this, SIGNAL(leaveEvent()),this,SLOT(changeOnMouse()), Qt::DirectConnection);
     connect(this,SIGNAL(HoverLeave(QPointF,const QPointF)), this, SLOT(changeOnMouse()),Qt::DirectConnection);
 
@@ -57,14 +64,18 @@ void DrawingArea::paintEvent(QPaintEvent *event)
     if(polygon_is_complited)
     {
         if(polygonPoints.size()==3 && chosen_door){
-            doors_for_rooms.push_back(new Door(QLineF(polygonPoints.at(0),polygonPoints.at(1))));
+
+            doors_for_rooms.push_back(new Door(QLineF(polygonPoints.at(0),polygonPoints.at(1)), wall_height, wall_thickness));
             chosen_door=false;
+
         }else if(polygonPoints.size()==3 && chosen_window){
-            windows_for_rooms.push_back(new Window(QLineF(polygonPoints.at(0),polygonPoints.at(1))));
+
+            windows_for_rooms.push_back(new Window(QLineF(polygonPoints.at(0),polygonPoints.at(1)), wall_height, wall_thickness));
             chosen_window=false;
+
         }
         else
-            walls_for_rooms.push_back(new Wall(QPolygonF(polygonPoints)));
+            walls_for_rooms.push_back(new Wall(QPolygonF(polygonPoints), wall_height, wall_thickness));
     }
     //losa implementacija ali za sad ce da koristi
     for(auto i=walls_for_rooms.begin(); i!=walls_for_rooms.end(); i++)
@@ -138,9 +149,9 @@ void DrawingArea::paintEvent(QPaintEvent *event)
               if(aviable_complete_polygon)
               {
                   painter.drawPolygon(finalPolygon);
-                  emit update_status_finish(QString(tr("polygon can be finished")));
+                  emit update_status_finish(QString(tr("moze da se zavrsi")));
                }else
-                  emit update_status_finish(QString(tr("this polygon can't be finished !")));
+                  emit update_status_finish(QString(tr("ne moze da se zavrsi")));
         }
 
          emit have_points(polygonPoints.size());
@@ -188,7 +199,7 @@ void DrawingArea::mousePressEvent(QMouseEvent * e)
          polygonPoints.push_back(point2);
     }
     else
-        emit fail_to_add_peak(QString(tr("ololo! not here!")));
+        emit fail_to_add_peak(QString(tr("ne moze ovde da se crta")));
 
     this ->repaint();
 
@@ -223,9 +234,9 @@ void DrawingArea::mouseMoveEvent(QMouseEvent * e)
            }
       }
       if(aviable_here_place_newPoint)
-          update_status(QString(tr("you can tag new peak here")));
+          update_status(QString(tr("moze da se stavi tacka")));
       else
-          update_status(QString(tr("you can not tag new peak here")));
+          update_status(QString(tr("ne moze da se stavi tacka")));
 
 
       this ->repaint();
@@ -299,17 +310,71 @@ void DrawingArea::changeOnMouse()
     on_mouse = false;
     repaint();
 }
-
+void DrawingArea::reinit_floors(){
+    walls_for_rooms.clear();
+    windows_for_rooms.clear();
+    doors_for_rooms.clear();
+}
 void DrawingArea::keyPressEvent(QKeyEvent *e){
 
     if(e->key()==Qt::Key_W){
 
         chosen_window = true;
-
+        this->repaint();
     }else if(e->key()==Qt::Key_D){
 
         chosen_door = true;
+        this->repaint();
+    }else if(e->key()==Qt::Key_C){
 
+        input_dialog->show();
+        this->repaint();
+
+    }else if(e->key()==Qt::Key_N){
+        floors.push_back(new Floor(walls_for_rooms, windows_for_rooms, doors_for_rooms));
+        walls_for_rooms.clear();
+        windows_for_rooms.clear();
+        doors_for_rooms.clear();
+        last_floor++;
+        reinitialize();
+    }else if(e->key()==Qt::Key_B){
+        if(last_floor-1<0)
+            return;
+        last_floor--;
+        reinitialize();
+        reinit_floors();
+        walls_for_rooms=floors.at(last_floor)->getwalls();
+        windows_for_rooms=floors.at(last_floor)->getwindows();
+        doors_for_rooms=floors.at(last_floor)->getdoors();
+        this->repaint();
+    }else if(e->key()==Qt::Key_F){
+        if(last_floor+1>floors.size())
+            return;
+        if(last_floor+1==floors.size()){
+            last_floor++;
+            reinitialize();
+            reinit_floors();
+            this->repaint();
+            return;
+        }
+        last_floor++;
+        reinitialize();
+        reinit_floors();
+        walls_for_rooms=floors.at(last_floor)->getwalls();
+        windows_for_rooms=floors.at(last_floor)->getwindows();
+        doors_for_rooms=floors.at(last_floor)->getdoors();
+        this->repaint();
+    }else if(e->key()==Qt::Key_S){
+
+        floors.at(last_floor)->setwalls(walls_for_rooms);
+        floors.at(last_floor)->setwindows(windows_for_rooms);
+        floors.at(last_floor)->setdoors(doors_for_rooms);
+        this->repaint();
     }
-    QApplication::processEvents();
+
+}
+
+void DrawingArea::changedParams(){
+    wall_height=input_dialog->height();
+    wall_thickness=input_dialog->thickness();
 }

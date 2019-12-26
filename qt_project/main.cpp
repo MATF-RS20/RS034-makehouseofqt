@@ -9,7 +9,6 @@ int main( int argc, char **argv )
 
   MainWindow mainwindow;
   mainwindow.setMouseTracking(1);
- // mainwindow.setFixedSize(640,480);
   mainwindow.setGeometry(0,0,880,680);
   mainwindow.show();
 

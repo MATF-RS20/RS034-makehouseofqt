@@ -16,6 +16,8 @@
 #include "wall.h"
 #include "window.h"
 #include "door.h"
+#include "inputdialog.h"
+#include "floor.h"
 
 class DrawingArea : public QWidget
 {
@@ -62,6 +64,7 @@ public slots:
 
     void complete_drawing();
     void reset_drawing();
+    void changedParams();
 
 private slots:
 
@@ -90,7 +93,13 @@ private:
     QVector<Wall*> walls_for_rooms;
     QVector<Door*> doors_for_rooms;
     QVector<Window*> windows_for_rooms;
+    QVector<Floor*> floors;
+    InputDialog* input_dialog;
+    float wall_height;
+    float wall_thickness;
+    int last_floor;
     void reinitialize();
+    void reinit_floors();
 };
 
 #endif // DRAWINGAREA_H
