@@ -65,27 +65,26 @@ void DrawingArea::paintEvent(QPaintEvent *event)
     {
         if(polygonPoints.size()==3 && chosen_door){
 
-            doors_for_rooms.push_back(new Door(QLineF(polygonPoints.at(0),polygonPoints.at(1)), wall_height, wall_thickness));
+            for(Wall* w: walls_for_rooms){
+                if(w->containsPoints(polygonPoints))
+                    w->addDoor(new Door(QLineF(polygonPoints.at(0), polygonPoints.at(1)), wall_height, wall_thickness));
+            }
             chosen_door=false;
 
         }else if(polygonPoints.size()==3 && chosen_window){
 
-            windows_for_rooms.push_back(new Window(QLineF(polygonPoints.at(0),polygonPoints.at(1)), wall_height, wall_thickness));
+            for(Wall *w: walls_for_rooms)
+                if(w->containsPoints(polygonPoints))
+                    w->addWindow(new Window(QLineF(polygonPoints.at(0), polygonPoints.at(1)), wall_height, wall_thickness));
             chosen_window=false;
 
         }
         else
             walls_for_rooms.push_back(new Wall(QPolygonF(polygonPoints), wall_height, wall_thickness));
     }
-    //losa implementacija ali za sad ce da koristi
-    for(auto i=walls_for_rooms.begin(); i!=walls_for_rooms.end(); i++)
-        (*i)->paint(&painter,Q_NULLPTR,Q_NULLPTR);
+    for(Wall* i: walls_for_rooms)
+        i->paint(&painter,Q_NULLPTR,Q_NULLPTR);
 
-    for(auto i=windows_for_rooms.begin(); i!=windows_for_rooms.end(); i++)
-        (*i)->paint(&painter,Q_NULLPTR,Q_NULLPTR);
-
-    for(auto i=doors_for_rooms.begin(); i!=doors_for_rooms.end(); i++)
-        (*i)->paint(&painter,Q_NULLPTR,Q_NULLPTR);
 
     //laksa navigacija kroz mrezu
     QRectF textRect( 4,  5, 200, 20);
@@ -312,8 +311,7 @@ void DrawingArea::changeOnMouse()
 }
 void DrawingArea::reinit_floors(){
     walls_for_rooms.clear();
-    windows_for_rooms.clear();
-    doors_for_rooms.clear();
+
 }
 void DrawingArea::keyPressEvent(QKeyEvent *e){
 
@@ -331,10 +329,8 @@ void DrawingArea::keyPressEvent(QKeyEvent *e){
         this->repaint();
 
     }else if(e->key()==Qt::Key_N){
-        floors.push_back(new Floor(walls_for_rooms, windows_for_rooms, doors_for_rooms));
+        floors.push_back(new Floor(walls_for_rooms));
         walls_for_rooms.clear();
-        windows_for_rooms.clear();
-        doors_for_rooms.clear();
         last_floor++;
         reinitialize();
     }else if(e->key()==Qt::Key_B){
@@ -344,8 +340,6 @@ void DrawingArea::keyPressEvent(QKeyEvent *e){
         reinitialize();
         reinit_floors();
         walls_for_rooms=floors.at(last_floor)->getwalls();
-        windows_for_rooms=floors.at(last_floor)->getwindows();
-        doors_for_rooms=floors.at(last_floor)->getdoors();
         this->repaint();
     }else if(e->key()==Qt::Key_F){
         if(last_floor+1>floors.size())
@@ -361,14 +355,10 @@ void DrawingArea::keyPressEvent(QKeyEvent *e){
         reinitialize();
         reinit_floors();
         walls_for_rooms=floors.at(last_floor)->getwalls();
-        windows_for_rooms=floors.at(last_floor)->getwindows();
-        doors_for_rooms=floors.at(last_floor)->getdoors();
         this->repaint();
     }else if(e->key()==Qt::Key_S){
 
         floors.at(last_floor)->setwalls(walls_for_rooms);
-        floors.at(last_floor)->setwindows(windows_for_rooms);
-        floors.at(last_floor)->setdoors(doors_for_rooms);
         this->repaint();
     }
 

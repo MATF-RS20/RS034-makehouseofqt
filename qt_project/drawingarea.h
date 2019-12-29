@@ -91,8 +91,6 @@ private:
     QPen first_line_style;
     QPen last_line_style_fail;
     QVector<Wall*> walls_for_rooms;
-    QVector<Door*> doors_for_rooms;
-    QVector<Window*> windows_for_rooms;
     QVector<Floor*> floors;
     InputDialog* input_dialog;
     float wall_height;

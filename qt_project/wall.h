@@ -6,6 +6,9 @@
 #include <QGraphicsPolygonItem>
 #include <QPen>
 #include <QPainter>
+#include "window.h"
+#include "door.h"
+
 class Wall: public QGraphicsPolygonItem
 {
 public:
@@ -20,15 +23,23 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    /*TODO
-    shape()
-    */
+    void addWindow(Window* window);
+
+    void addDoor(Door* door);
+
+    QVector<Window*> getWindows();
+
+    QVector<Door*> getDoors();
+
+    bool containsPoints(QVector<QPointF> lines);
+
 private:
 
     QPolygonF _walls_of_rooms;
+    QVector<Window*> _windows;
+    QVector<Door*> _doors;
     double _height;
     double _thickness;
-
 
 };
 
