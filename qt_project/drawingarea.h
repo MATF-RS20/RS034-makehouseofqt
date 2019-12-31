@@ -47,6 +47,7 @@ public:
 
     bool aviable_complete_polygon;
 
+    QVector<Wall*> getWall();
 signals:
 
     void releaseMouse();

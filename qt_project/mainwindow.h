@@ -11,7 +11,8 @@
 #include <QGridLayout>
 #include <QEvent>
 #include <QtWidgets>
-#include"drawingarea.h"
+#include "drawingarea.h"
+#include "wallsmodelview.h"
 
 class MainWindow : public QWidget
 {
@@ -48,11 +49,13 @@ signals:
 private slots:
 
     void reseting();
+    void on_buttonWallsView_clicked();
 
 private:
 
+    bool clicked;
     DrawingArea *drawingarea;
-    QPushButton *buttonReset, *buttonComplete ;
+    QPushButton *buttonReset, *buttonComplete, *buttonWallsView ;
 
 };
 

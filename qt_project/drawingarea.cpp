@@ -368,3 +368,7 @@ void DrawingArea::changedParams(){
     wall_height=input_dialog->height();
     wall_thickness=input_dialog->thickness();
 }
+
+QVector<Wall*> DrawingArea::getWall(){
+    return walls_for_rooms;
+}

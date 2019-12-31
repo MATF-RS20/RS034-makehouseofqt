@@ -6,6 +6,7 @@
 #include <QGraphicsPolygonItem>
 #include <QPen>
 #include <QPainter>
+#include <QOpenGLWindow>
 #include "window.h"
 #include "door.h"
 
@@ -33,13 +34,24 @@ public:
 
     bool containsPoints(QVector<QPointF> lines);
 
+    QPointF middleOfTheRoom();
+
+    void generateWallsForView(QVector<GLfloat> &vertices, QVector<GLfloat> &colors,QColor color);
+
+    QVector<GLfloat> wall(QPointF p1, QPointF p2);
+
+    void generateRoof(QVector<GLfloat> &vertices, QVector<GLfloat> &roof_color);
+
+    QVector<GLfloat> roof(QPointF p1, QPointF p2);
+
+
 private:
 
     QPolygonF _walls_of_rooms;
     QVector<Window*> _windows;
     QVector<Door*> _doors;
-    double _height;
-    double _thickness;
+    float _height;
+    float _thickness;
 
 };
 

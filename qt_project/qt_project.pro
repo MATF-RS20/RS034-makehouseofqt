@@ -4,12 +4,14 @@
 #
 #-------------------------------------------------
 
-QT       += widgets core gui
+QT       += widgets core gui opengl
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = qt_project
 TEMPLATE = app
+LIBS += -L/usr/local/lib -lGLU
+# LIBS +=-lopengl32 -lglu32
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -31,7 +33,8 @@ SOURCES += \
     window.cpp \
     wall.cpp \
     inputdialog.cpp \
-    floor.cpp
+    floor.cpp \
+    wallsmodelview.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -40,7 +43,8 @@ HEADERS += \
     window.h \
     wall.h \
     inputdialog.h \
-    floor.h
+    floor.h \
+    wallsmodelview.h
 
 FORMS += \
     inputdialog.ui

@@ -4,15 +4,15 @@ MainWindow::MainWindow(QWidget *parent): QWidget(parent)
 {
     this->setWindowTitle("Kucni Pomocnik");
     drawingarea = new DrawingArea();
+
     QPalette p;
     p.setColor(QPalette::Background, Qt::white);
     drawingarea -> setPalette(p);
-    drawingarea->setGeometry(0,0,600,500);
-    drawingarea->setBackgroundRole(QPalette::Base);
+    drawingarea-> setGeometry(0,0,600,500);
+    drawingarea-> setBackgroundRole(QPalette::Base);
     drawingarea -> setAutoFillBackground(true);
     drawingarea -> setMouseTracking(1);
     drawingarea -> setCursor(Qt::CrossCursor);
-    drawingarea -> setMouseTracking(1);
     drawingarea -> setWindowFlags(Qt::Window);
 
     buttonReset = new QPushButton;
@@ -20,7 +20,11 @@ MainWindow::MainWindow(QWidget *parent): QWidget(parent)
     buttonComplete = new QPushButton;
     buttonComplete ->setText("Zavrsi nacrt");
     statusBar = new QLabel("status");
+    buttonWallsView = new QPushButton;
+    buttonWallsView->setText("3D prikaz zidova");
     this ->setUpdatesEnabled(true);
+
+    clicked=true;
 
     QGridLayout *mainLayout = new QGridLayout;
 
@@ -29,14 +33,16 @@ MainWindow::MainWindow(QWidget *parent): QWidget(parent)
     mainLayout->addWidget( drawingarea,  0, 0, 1, 4);
     mainLayout->addWidget(buttonComplete,1, 0, 1, 1,Qt::AlignLeft);
     mainLayout->addWidget(buttonReset,1, 1, 1, 1);
+    mainLayout->addWidget(buttonWallsView, 1, 2, 1, 1);
     setLayout(mainLayout);
     buttonReset->setEnabled(false);
     buttonComplete->setEnabled(false);
-
+    buttonWallsView->setEnabled(false);
     connect(this -> drawingarea, SIGNAL(releaseMouse()), this, SLOT(grabMouse()),Qt::DirectConnection);
     connect(this -> drawingarea, SIGNAL(have_points(int)), this, SLOT(setPointsnumber(int)),Qt::DirectConnection);
     connect(this->buttonReset, SIGNAL(clicked()), this ->drawingarea, SLOT(reset_drawing()), Qt::DirectConnection );
     connect(this->buttonReset, SIGNAL(clicked()), this, SLOT(reseting()));
+    connect(this->buttonWallsView, SIGNAL(clicked(bool)), this, SLOT(on_buttonWallsView_clicked()));
     connect(this->buttonComplete, SIGNAL(clicked()), this ->drawingarea, SLOT(complete_drawing()), Qt::DirectConnection);
     connect(this ->drawingarea, SIGNAL(have_been_reseting(QString)),this->statusBar, SLOT(setText(QString)),Qt::AutoConnection);
     connect(this->drawingarea, SIGNAL(send_polygon_size(QString)), this->statusBar, SLOT(setText(QString )),Qt::DirectConnection);
@@ -69,12 +75,23 @@ void MainWindow::setPointsnumber(int)
 {
 this->buttonReset   ->setEnabled(true);
 this->buttonComplete->setEnabled(true);
-
+this->buttonWallsView->setEnabled(true);
 }
 
 void MainWindow::reseting()
 {
-    buttonReset    -> setEnabled(false);
-    buttonComplete -> setEnabled(false);
+    buttonReset    -> setEnabled(true);
+    buttonComplete -> setEnabled(true);
     update();
+}
+
+void MainWindow::on_buttonWallsView_clicked(){
+    WallsModelView* wmv=new WallsModelView(drawingarea->getWall());
+
+    if(clicked){
+        wmv->show();
+    }else{
+        wmv->hide();
+    }
+    clicked=!clicked && true;
 }
