@@ -55,7 +55,6 @@ public:
 
     void addDecorativeWall(Wall* wall);
 
-    void setingAngle(QLineF &l1, QLineF &l2);
 private:
 
     QPolygonF _walls_of_rooms;

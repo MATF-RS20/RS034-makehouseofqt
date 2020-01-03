@@ -77,7 +77,6 @@ bool Wall::containsPoints(QLineF &l2){
         if((p2.containsPoint(l2.p1(), Qt::FillRule()) || p2.containsPoint(l2.p2(), Qt::FillRule()))){
 
 
-            setingAngle(l1,l2);
 
             return true;
         }
@@ -85,13 +84,11 @@ bool Wall::containsPoints(QLineF &l2){
          if(l1.intersect(l2,&p)==QLineF::BoundedIntersection){
 
 
-             setingAngle(l1,l2);
              return true;
          }
 
          if(isIntersect(l1, l2)){
 
-             setingAngle(l1,l2);
              return true;
          }
 
@@ -107,12 +104,7 @@ bool Wall::containsPoints(QLineF &l2){
     }
     return false;
 }
-void Wall::setingAngle(QLineF &l1, QLineF &l2){
-    if(l1.angle()>180 && l2.angle()<180){
-        l2.setAngle(l1.angle()-180);
-    }else if(l1.angle()<=180 && l2.angle()>180 )
-        l2.setAngle(l1.angle()+180);
-}
+
 QPointF Wall::middleOfTheRoom(){
     float x=0, y=0;
     for (QPointF p: _walls_of_rooms){
