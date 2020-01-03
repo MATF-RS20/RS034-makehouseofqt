@@ -36,6 +36,8 @@ protected:
 
     void initialize_vbos();
 
+    void keyPressEvent(QKeyEvent *event);
+
 
 private:
     QOpenGLContext* openGLContext;
@@ -46,10 +48,10 @@ private:
     QOpenGLBuffer* vbo_colors;
     QVector<GLfloat> vertices;
     QVector<GLfloat> colors;
-//    QOpenGLBuffer* vbo_roof_vertices;
-//    QOpenGLBuffer* vbo_roof_colors;
-//    QVector<GLfloat> roof_vertices;
-//    QVector<GLfloat> roof_colors;
+    QOpenGLBuffer* vbo_roof_vertices;
+    QOpenGLBuffer* vbo_roof_colors;
+    QVector<GLfloat> roof_vertices;
+    QVector<GLfloat> roof_colors;
     QTime* time;
     QColor _color;
     QPointF lastPos;
@@ -58,6 +60,7 @@ private:
     int oldTime = 0;
     float deltaTime = 0;
     float rotation = 0;
+    bool selected=false;
     GLfloat rotationX=0, rotationY=0, rotationZ=0;
 };
 

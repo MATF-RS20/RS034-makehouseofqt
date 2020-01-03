@@ -34,9 +34,6 @@ DrawingArea::DrawingArea(QWidget *parent)
     first_line_style.setStyle(Qt::DashDotDotLine);
     first_line_style.setColor(Qt::black);
 
-    connect(this, SIGNAL(leaveEvent()),this,SLOT(changeOnMouse()), Qt::DirectConnection);
-    connect(this,SIGNAL(HoverLeave(QPointF,const QPointF)), this, SLOT(changeOnMouse()),Qt::DirectConnection);
-
 }
 
 void DrawingArea::paintEvent(QPaintEvent *event)
@@ -65,19 +62,28 @@ void DrawingArea::paintEvent(QPaintEvent *event)
     {
         if(polygonPoints.size()==3 && chosen_door){
 
+
             for(Wall* w: walls_for_rooms){
-                if(w->containsPoints(polygonPoints))
-                    w->addDoor(new Door(QLineF(polygonPoints.at(0), polygonPoints.at(1)), wall_height, wall_thickness));
+                QLineF line(polygonPoints.at(0), polygonPoints.at(1));
+                if(w->containsPoints(line))
+                    w->addDoor(new Door(line, wall_height, wall_thickness));
             }
             chosen_door=false;
 
         }else if(polygonPoints.size()==3 && chosen_window){
 
-            for(Wall *w: walls_for_rooms)
-                if(w->containsPoints(polygonPoints))
-                    w->addWindow(new Window(QLineF(polygonPoints.at(0), polygonPoints.at(1)), wall_height, wall_thickness));
+            for(Wall *w: walls_for_rooms){
+                QLineF line(polygonPoints.at(0), polygonPoints.at(1));
+                if(w->containsPoints(line))
+                    w->addWindow(new Window(line, wall_height, wall_thickness));
+            }
             chosen_window=false;
 
+        }
+        else if(polygonPoints.size()==3){
+            for(Wall* w:walls_for_rooms)
+                if(w->canMakeDecorativeWall(polygonPoints))
+                    w->addDecorativeWall(new Wall(polygonPoints, wall_height, wall_thickness));
         }
         else
             walls_for_rooms.push_back(new Wall(QPolygonF(polygonPoints), wall_height, wall_thickness));
@@ -261,7 +267,7 @@ QSize DrawingArea::sizeHint() const
 
 bool DrawingArea::isIntersect(QLineF line1, QLineF line2)
 {
-    double a1,a2,a3,a4; int x11,y11,x12,y12, x21, y21,x22,y22;
+    double a1,a2,a3,a4; double x11,y11,x12,y12, x21, y21,x22,y22;
     x11 = line1.p1().x(); y11 = line1.p1().y();
     x12 = line1.p2().x(); y12 = line1.p2().y();
     x21 = line2.p1().x(); y21 = line2.p1().y();
@@ -277,10 +283,8 @@ bool DrawingArea::isIntersect(QLineF line1, QLineF line2)
 }
 
 void DrawingArea::reinitialize(){
-    lines.resize(0);
-    lines.clear();//nepotrebno
-    polygonPoints.resize(0);
-    polygonPoints.clear();//nepotrebno
+    lines.clear();
+    polygonPoints.clear();
     first_line_exist = false;
     start_exist = false;
     aviable_here_place_newPoint = true;
@@ -288,7 +292,7 @@ void DrawingArea::reinitialize(){
     polygon_is_complited = false;
     on_mouse = false;
     aviable_complete_polygon = false;
-    emit have_been_reseting(QString(tr("Drawing new polygon...")));
+    emit have_been_reseting(QString(tr("Crtamo novi poligon...")));
     this -> repaint();
 }
 void DrawingArea::complete_drawing(){
@@ -371,4 +375,7 @@ void DrawingArea::changedParams(){
 
 QVector<Wall*> DrawingArea::getWall(){
     return walls_for_rooms;
+}
+QVector<Floor*> DrawingArea::getFloor(){
+    return floors;
 }

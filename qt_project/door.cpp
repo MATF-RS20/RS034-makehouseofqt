@@ -83,9 +83,26 @@ void Door::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
             painter->drawPie(rectangle, startangle*16, 90*16);
         }
     }
-
-
-
-
-
+}
+QVector<GLfloat> Door::gdoor(){
+    qreal c= 20.0;
+    GLfloat p1x= (GLfloat) _doorline.p1().x()/c;
+    GLfloat p1y= (GLfloat) _doorline.p1().y()/c;
+    GLfloat p2x= (GLfloat) _doorline.p2().x()/c;
+    GLfloat p2y= (GLfloat) _doorline.p2().y()/c;
+    return {
+        p2x, (GLfloat) 2*_height, p2y,
+        p2x, 0, p2y,
+        p1x, 0, p1y,
+        p1x, (GLfloat) 2*_height, p1y,
+        p2x, (GLfloat) 2*_height, p2y,
+        p1x, 0, p1y
+    };
+}
+void Door::generateDoor(QVector<GLfloat> &vert, QVector<GLfloat> &uvss){
+    QVector<GLfloat> array=gdoor();
+    for(auto t:array)
+        vert.push_back(t);
+    for(auto p: uvs)
+        uvss.push_back(p);
 }

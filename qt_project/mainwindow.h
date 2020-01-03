@@ -13,7 +13,7 @@
 #include <QtWidgets>
 #include "drawingarea.h"
 #include "wallsmodelview.h"
-
+#include "house.h"
 class MainWindow : public QWidget
 {
     Q_OBJECT
@@ -50,12 +50,14 @@ private slots:
 
     void reseting();
     void on_buttonWallsView_clicked();
+    void on_buttonHouse_clicked();
 
 private:
 
     bool clicked;
     DrawingArea *drawingarea;
-    QPushButton *buttonReset, *buttonComplete, *buttonWallsView ;
+    QPushButton *buttonReset, *buttonComplete, *buttonWallsView, *buttonHouse;
+    QColor selected_color;
 
 };
 

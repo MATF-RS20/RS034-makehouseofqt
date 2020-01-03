@@ -34,7 +34,9 @@ SOURCES += \
     wall.cpp \
     inputdialog.cpp \
     floor.cpp \
-    wallsmodelview.cpp
+    wallsmodelview.cpp \
+    house.cpp \
+    selectingform.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -44,7 +46,16 @@ HEADERS += \
     wall.h \
     inputdialog.h \
     floor.h \
-    wallsmodelview.h
+    wallsmodelview.h \
+    house.h \
+    selectingform.h
 
 FORMS += \
-    inputdialog.ui
+    inputdialog.ui \
+    selectingform.ui
+
+DISTFILES += \
+    k.bmp \
+    window.bmp \
+    beige.jpg \
+    d2.png

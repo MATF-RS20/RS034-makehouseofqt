@@ -1,6 +1,7 @@
 #include "wallsmodelview.h"
 WallsModelView::WallsModelView(QVector<Wall*> walls):_walls(walls)
 {
+    this->setTitle("3D prikaza Kuce");
     setSurfaceType(QWindow::OpenGLSurface);
 
     QSurfaceFormat format;
@@ -48,6 +49,7 @@ void WallsModelView::initializeGL()
 
     for(Wall *w: _walls){
         w->generateWallsForView(vertices, colors, _color);
+        w->generateRoof(roof_vertices, roof_colors);
     }
 
     vao = new QOpenGLVertexArrayObject();
@@ -102,6 +104,20 @@ void WallsModelView::paintEvent(QPaintEvent *event)
 
     glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 
+    if(selected){
+        vbo_roof_vertices->bind();
+        shaderProgram->bindAttributeLocation("posAttr", 0);
+        shaderProgram->enableAttributeArray(0);
+        shaderProgram->setAttributeBuffer(0, GL_FLOAT, 0, 3);
+
+        vbo_roof_colors->bind();
+        shaderProgram->bindAttributeLocation("colAttr", 1);
+        shaderProgram->enableAttributeArray(1);
+        shaderProgram->setAttributeBuffer(1, GL_FLOAT, 0, 3);
+
+        glDrawArrays(GL_TRIANGLES, 0, roof_vertices.size());
+
+    }
     shaderProgram->release();
     vao->release();
 
@@ -155,6 +171,7 @@ void WallsModelView::mouseMoveEvent(QMouseEvent *event){
 }
 
 void WallsModelView::initialize_vbos(){
+
     vbo_vertices = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
     vbo_vertices->create();
     vbo_vertices->setUsagePattern(QOpenGLBuffer::StaticDraw);
@@ -167,6 +184,23 @@ void WallsModelView::initialize_vbos(){
     vbo_colors->bind();
     vbo_colors->allocate(colors.begin(), colors.size() * sizeof(GLfloat));
 
+    vbo_roof_vertices = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+    vbo_roof_vertices->create();
+    vbo_roof_vertices->setUsagePattern(QOpenGLBuffer::StaticDraw);
+    vbo_roof_vertices->bind();
+    vbo_roof_vertices->allocate(roof_vertices.begin(), roof_vertices.size() * sizeof(GLfloat));
 
+    vbo_roof_colors = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+    vbo_roof_colors->create();
+    vbo_roof_colors->setUsagePattern(QOpenGLBuffer::StaticDraw);
+    vbo_roof_colors->bind();
+    vbo_roof_colors->allocate(roof_colors.begin(), roof_colors.size() * sizeof(GLfloat));
+
+}
+
+void WallsModelView::keyPressEvent(QKeyEvent *event){
+    if(event->key()==Qt::Key_R){
+        selected=!selected && true;
+    }
 }
 

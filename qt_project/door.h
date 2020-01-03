@@ -6,7 +6,7 @@
 #include <QGraphicsLineItem>
 #include <QPen>
 #include <QPainter>
-
+#include <QOpenGLWindow>
 class Door: public QGraphicsLineItem
 {
 public:
@@ -14,17 +14,26 @@ public:
 
     QLineF door();
 
-    /*TODO
-    shape()
-    */
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+    QVector<GLfloat> gdoor();
+
+    void generateDoor(QVector<GLfloat> &vert, QVector<GLfloat> &uvss);
 
 private:
 
     QLineF _doorline;
     float _height;
     float _thickness;
-
+    QVector<GLfloat> uvs=
+    {
+        0.4f, 0.4f,
+        0.4f, -0.4f,
+        -0.4f, -0.4f,
+        -0.4f, 0.4f,
+        0.4f, 0.4f,
+        -0.4f, -0.4f,
+    };
 };
 
 #endif // DOOR_H

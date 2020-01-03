@@ -16,12 +16,14 @@ MainWindow::MainWindow(QWidget *parent): QWidget(parent)
     drawingarea -> setWindowFlags(Qt::Window);
 
     buttonReset = new QPushButton;
-    buttonReset ->setText("Obrisi trenutno nacrtano");
+    buttonReset ->setText("Obrisi trenutno crtanje");
     buttonComplete = new QPushButton;
     buttonComplete ->setText("Zavrsi nacrt");
     statusBar = new QLabel("status");
     buttonWallsView = new QPushButton;
     buttonWallsView->setText("3D prikaz zidova");
+    buttonHouse = new QPushButton;
+    buttonHouse->setText("3D setnja kroz kucu");
     this ->setUpdatesEnabled(true);
 
     clicked=true;
@@ -34,15 +36,18 @@ MainWindow::MainWindow(QWidget *parent): QWidget(parent)
     mainLayout->addWidget(buttonComplete,1, 0, 1, 1,Qt::AlignLeft);
     mainLayout->addWidget(buttonReset,1, 1, 1, 1);
     mainLayout->addWidget(buttonWallsView, 1, 2, 1, 1);
+    mainLayout->addWidget(buttonHouse,1, 3, 1, 1);
     setLayout(mainLayout);
     buttonReset->setEnabled(false);
     buttonComplete->setEnabled(false);
     buttonWallsView->setEnabled(false);
-    connect(this -> drawingarea, SIGNAL(releaseMouse()), this, SLOT(grabMouse()),Qt::DirectConnection);
+    buttonHouse->setEnabled(false);
+
     connect(this -> drawingarea, SIGNAL(have_points(int)), this, SLOT(setPointsnumber(int)),Qt::DirectConnection);
     connect(this->buttonReset, SIGNAL(clicked()), this ->drawingarea, SLOT(reset_drawing()), Qt::DirectConnection );
     connect(this->buttonReset, SIGNAL(clicked()), this, SLOT(reseting()));
     connect(this->buttonWallsView, SIGNAL(clicked(bool)), this, SLOT(on_buttonWallsView_clicked()));
+    connect(this->buttonHouse, SIGNAL(clicked(bool)), this, SLOT(on_buttonHouse_clicked()));
     connect(this->buttonComplete, SIGNAL(clicked()), this ->drawingarea, SLOT(complete_drawing()), Qt::DirectConnection);
     connect(this ->drawingarea, SIGNAL(have_been_reseting(QString)),this->statusBar, SLOT(setText(QString)),Qt::AutoConnection);
     connect(this->drawingarea, SIGNAL(send_polygon_size(QString)), this->statusBar, SLOT(setText(QString )),Qt::DirectConnection);
@@ -50,7 +55,6 @@ MainWindow::MainWindow(QWidget *parent): QWidget(parent)
     connect(this->drawingarea,SIGNAL(update_status_finish(QString)),this->statusBar,SLOT(setText(QString)),Qt::DirectConnection);
     connect(this->drawingarea,SIGNAL(update_status(QString)),this->statusBar,SLOT(setText(QString)),Qt::DirectConnection);
     connect(this->drawingarea,SIGNAL(enableCompleteDrawing(bool)),this->buttonComplete,SLOT(setEnabled(bool)),Qt::DirectConnection);
-    connect(this->drawingarea, SIGNAL(leaveEvent(QMouseEvent)),this,SLOT(showNormal()),Qt::DirectConnection );
     connect(this,SIGNAL(grabMouse()),this->drawingarea,SLOT(changeOnMouse()),Qt::DirectConnection);
     connect(this->drawingarea, SIGNAL(HoverLeave(QPointF&,QPointF)), this -> drawingarea, SLOT(changeOnMouse()), Qt::DirectConnection);
     connect(this,SIGNAL(enterEvent_()),this->drawingarea, SLOT(changeOnMouse()),Qt::DirectConnection);
@@ -76,6 +80,7 @@ void MainWindow::setPointsnumber(int)
 this->buttonReset   ->setEnabled(true);
 this->buttonComplete->setEnabled(true);
 this->buttonWallsView->setEnabled(true);
+this->buttonHouse->setEnabled(true);
 }
 
 void MainWindow::reseting()
@@ -94,4 +99,13 @@ void MainWindow::on_buttonWallsView_clicked(){
         wmv->hide();
     }
     clicked=!clicked && true;
+}
+
+void MainWindow::on_buttonHouse_clicked(){
+    House *house= new House(this->drawingarea->getFloor());
+
+
+    house->show();
+
+
 }

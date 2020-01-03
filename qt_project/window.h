@@ -6,7 +6,7 @@
 #include <QColor>
 #include <QPen>
 #include <QPainter>
-
+#include <QOpenGLWindow>
 class Window: public QGraphicsLineItem
 {
 public:
@@ -14,17 +14,28 @@ public:
     Window(QLineF windowline, float height=2, float thickness=0.25);
         QLineF window();
 
-    /*TODO
-    shape()
-    */
+
      void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+     QVector<GLfloat> gwindow();
+
+     void generateWindow(QVector<GLfloat> &vert, QVector<GLfloat> &uvss);
+
 
 private:
 
     QLineF _windowline;
     float _height;
     float _thickness;
-
+    QVector<GLfloat> uvs=
+    {
+        0.4f, 0.4f,
+        0.4f, -0.4f,
+        -0.4f, -0.4f,
+        -0.4f, 0.4f,
+        0.4f, 0.4f,
+        -0.4f, -0.4f,
+    };
 };
 
 #endif // WINDOW_H

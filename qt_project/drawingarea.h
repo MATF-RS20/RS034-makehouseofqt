@@ -7,12 +7,10 @@
 #include <QGraphicsView>
 #include <QBrush>
 #include <QPen>
-#include <QHoverEvent>
 #include <QString>
 #include <math.h>
 #include <QVector>
 #include <QPainterPath>
-#include <QKeyEvent>
 #include "wall.h"
 #include "window.h"
 #include "door.h"
@@ -48,6 +46,7 @@ public:
     bool aviable_complete_polygon;
 
     QVector<Wall*> getWall();
+    QVector<Floor*> getFloor();
 signals:
 
     void releaseMouse();
