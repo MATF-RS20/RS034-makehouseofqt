@@ -224,9 +224,10 @@ void House::keyPressEvent(QKeyEvent *event){
         if(j+1>=_floors.size())
             return;
         j++;
-
+        i=0;
         deletingDataForDrawing();
 
+        
         _floors.at(j)->getwalls().at(i)->generateHouseWalls(_vertices, _uvs);
 
         initializeAgain();
@@ -235,6 +236,7 @@ void House::keyPressEvent(QKeyEvent *event){
         if(j-1<0)
             return;
         j--;
+        i=0;
 
         deletingDataForDrawing();
 
