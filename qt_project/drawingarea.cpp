@@ -85,7 +85,7 @@ void DrawingArea::paintEvent(QPaintEvent *event)
                 if(w->canMakeDecorativeWall(polygonPoints))
                     w->addDecorativeWall(new Wall(polygonPoints, wall_height, wall_thickness));
         }
-        else
+        else if(polygonPoints.size()>4)
             walls_for_rooms.push_back(new Wall(QPolygonF(polygonPoints), wall_height, wall_thickness));
     }
     for(Wall* i: walls_for_rooms)
