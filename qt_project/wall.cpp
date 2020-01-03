@@ -176,7 +176,7 @@ QVector<GLfloat> Wall::roof(QPointF p1, QPointF p2){
     GLfloat mx = (GLfloat) middle.x()/c;
     GLfloat my = (GLfloat) middle.y()/c;
     return {
-         mx, (GLfloat) (_height+2)/2, my,
+         mx, (GLfloat) (_height+1.5)/2, my,
          p2x, (GLfloat) _height/2,  p2y,
          p1x, (GLfloat) _height/2,  p1y
     };
