@@ -58,4 +58,8 @@ DISTFILES += \
     k.bmp \
     window.bmp \
     beige.jpg \
-    d2.png
+    d2.png \
+    fl.jpg \
+    wall.jpg \
+    door.jpeg \
+    blue.jpg

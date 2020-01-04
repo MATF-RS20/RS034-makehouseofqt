@@ -31,7 +31,6 @@ void House::initializeGL()
 
     for(int i=0; i<4; i++){
 
-        qDebug()<<QApplication::applicationDirPath();
         texture[i] = new QOpenGLTexture(QImage(QApplication::applicationDirPath()+tex[i]).mirrored());
         texture[i]->setMinificationFilter(QOpenGLTexture::Nearest);
         texture[i]->setMagnificationFilter(QOpenGLTexture::Linear);

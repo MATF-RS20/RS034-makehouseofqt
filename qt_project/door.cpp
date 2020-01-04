@@ -26,6 +26,8 @@ void Door::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     float y1 = (_doorline.y1());
     float y2 = (_doorline.y2());
 
+
+
     if (abs(x1-x2) > abs(y1-y2) and y1 >= 300){
         if (x2 > x1){
             QRectF rectangle(QPointF(x1-d, y1-90), QPointF(x2, y1+90));

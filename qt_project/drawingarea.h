@@ -76,13 +76,14 @@ private:
     bool start_exist;
     bool aviable_here_place_newPoint;
     bool first_line_exist;
-    bool isIntersect(QLineF line1, QLineF line2);
     bool polygon_is_complited;
     bool chosen_window;
     bool chosen_door;
+    bool intersect_happened;
     QVector<QLineF>::Iterator ii;
     QVector<QPointF> polygonPoints;
     QVector<QLineF> lines;
+    QList<QPolygonF> allPolys;
     QPointF startPoint;
     QPointF point1, point2;
     QPen pen_green;
@@ -98,6 +99,9 @@ private:
     int last_floor;
     void reinitialize();
     void reinit_floors();
+    float polygonArea(QPolygonF p, int n);
+    bool isIntersect(QLineF line1, QLineF line2);
+
 };
 
 #endif // DRAWINGAREA_H

@@ -13,6 +13,7 @@ DrawingArea::DrawingArea(QWidget *parent)
     polygon_is_complited = false;
     chosen_door=false;
     chosen_window=false;
+    intersect_happened=false;
     input_dialog=new InputDialog(this);
     wall_height=2.0;
     wall_thickness=0.25;
@@ -36,7 +37,20 @@ DrawingArea::DrawingArea(QWidget *parent)
     first_line_style.setColor(Qt::black);
 
 }
+float DrawingArea::polygonArea(QPolygonF p, int n)
+{
 
+    int a = 0, b = 0;
+    for (int i = 0; i < n-1; i++)
+    {
+        a += (p.value(i).rx()) * (p.value(i+1).ry());
+        b += (p.value(i).ry()) * (p.value(i+1).rx());
+
+    }
+
+    // Vrati apsolutnu vrednost
+    return abs((a-b) / 2000.00);
+}
 void DrawingArea::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
@@ -86,8 +100,31 @@ void DrawingArea::paintEvent(QPaintEvent *event)
                 if(w->canMakeDecorativeWall(polygonPoints))
                     w->addDecorativeWall(new Wall(polygonPoints, wall_height, wall_thickness));
         }
-        else if(polygonPoints.size()>4)
-            walls_for_rooms.push_back(new Wall(QPolygonF(polygonPoints), wall_height, wall_thickness));
+        else if(polygonPoints.size()>4){
+            //proveravamo da li se ovaj zid kosi sa ostalima u nizu
+            QPolygonF* potential_wal = new QPolygonF(polygonPoints);
+            allPolys.append(*potential_wal);
+            for(int i = 0; i < allPolys.size(); i++)
+            {
+                QPolygonF its = potential_wal->intersected(allPolys.at(i));
+
+                if(!its.empty() && its!=*potential_wal)
+                  {
+                    float area = polygonArea(its.toPolygon(), its.size());
+
+                    if(area >= 1.00){
+                        intersect_happened = true;
+                        allPolys.pop_back();
+                    }
+                  }
+                its.clear();
+             }
+            if(!intersect_happened)
+                walls_for_rooms.push_back(new Wall(*potential_wal, wall_height, wall_thickness));
+            else
+                intersect_happened = false;
+
+        }
     }
     for(Wall* i: walls_for_rooms)
         i->paint(&painter,Q_NULLPTR,Q_NULLPTR);
