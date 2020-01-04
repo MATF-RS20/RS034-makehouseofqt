@@ -1,8 +1,9 @@
 #include "drawingarea.h"
-
+#include <QMessageBox>
 DrawingArea::DrawingArea(QWidget *parent)
    : QWidget(parent)
 {
+
     setFocusPolicy(Qt::StrongFocus);//stavljeno je iz razloga sto nece tastere da registruje dovoljno brzo
     start_exist =false;
     on_mouse = false;
@@ -320,11 +321,11 @@ void DrawingArea::reinit_floors(){
 void DrawingArea::keyPressEvent(QKeyEvent *e){
 
     if(e->key()==Qt::Key_W){
-
+        chosen_door=false;
         chosen_window = true;
         this->repaint();
     }else if(e->key()==Qt::Key_D){
-
+        chosen_window=false;
         chosen_door = true;
         this->repaint();
     }else if(e->key()==Qt::Key_C){
@@ -333,37 +334,58 @@ void DrawingArea::keyPressEvent(QKeyEvent *e){
         this->repaint();
 
     }else if(e->key()==Qt::Key_N){
-        floors.push_back(new Floor(walls_for_rooms));
-        walls_for_rooms.clear();
-        last_floor++;
-        reinitialize();
+        if(walls_for_rooms.size()>0){
+            floors.push_back(new Floor(walls_for_rooms));
+            walls_for_rooms.clear();
+            last_floor++;
+            reinitialize();
+        }else{
+            QMessageBox::warning(this, tr("Upozorenje"),tr("Niste nacrtali sobe! "
+                                                           "Molim Vas nacrtajte."));
+        }
     }else if(e->key()==Qt::Key_B){
-        if(last_floor-1<0)
-            return;
-        last_floor--;
-        reinitialize();
-        reinit_floors();
-        walls_for_rooms=floors.at(last_floor)->getwalls();
-        this->repaint();
+        if(floors.size()>0){
+            if(last_floor-1<0)
+                return;
+            last_floor--;
+            reinitialize();
+            reinit_floors();
+            walls_for_rooms=floors.at(last_floor)->getwalls();
+            this->repaint();
+        }else{
+            QMessageBox::warning(this, tr("Upozorenje"),tr("Ova komanda radi samo kad "
+                                                           "imate na raspolaganju vise spratova"));
+        }
     }else if(e->key()==Qt::Key_F){
-        if(last_floor+1>floors.size())
-            return;
-        if(last_floor+1==floors.size()){
+        if(floors.size()>0){
+            if(last_floor+1>floors.size())
+                return;
+            if(last_floor+1==floors.size()){
+                last_floor++;
+                reinitialize();
+                reinit_floors();
+                this->repaint();
+                return;
+            }
             last_floor++;
             reinitialize();
             reinit_floors();
+            walls_for_rooms=floors.at(last_floor)->getwalls();
             this->repaint();
-            return;
+        }else{
+            QMessageBox::warning(this, tr("Upozorenje"),tr("Ova komanda radi samo kad "
+                                                           "imate na raspolaganju vise spratova"));
         }
-        last_floor++;
-        reinitialize();
-        reinit_floors();
-        walls_for_rooms=floors.at(last_floor)->getwalls();
-        this->repaint();
     }else if(e->key()==Qt::Key_S){
+        if(floors.size()>0){
+            floors.at(last_floor)->setwalls(walls_for_rooms);
+            this->repaint();
+        }else{
 
-        floors.at(last_floor)->setwalls(walls_for_rooms);
-        this->repaint();
+            QMessageBox::warning(this, tr("Upozorenje"),tr("Ova komanda radi samo kad zelite da promenite "
+                                                           "prethodni sprat. Da biste sacuvali i napravili novi sprat "
+                                                           "pritisnite taster N"));
+        }
     }
 
 }

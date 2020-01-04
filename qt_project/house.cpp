@@ -31,7 +31,8 @@ void House::initializeGL()
 
     for(int i=0; i<4; i++){
 
-        texture[i] = new QOpenGLTexture(QImage(tex[i]).mirrored());
+        qDebug()<<QApplication::applicationDirPath();
+        texture[i] = new QOpenGLTexture(QImage(QApplication::applicationDirPath()+tex[i]).mirrored());
         texture[i]->setMinificationFilter(QOpenGLTexture::Nearest);
         texture[i]->setMagnificationFilter(QOpenGLTexture::Linear);
 
@@ -223,11 +224,12 @@ void House::keyPressEvent(QKeyEvent *event){
     }else if(event->key()==Qt::Key_W){
         if(j+1>=_floors.size())
             return;
-        j++;
-        i=0;
-        deletingDataForDrawing();
 
-        
+
+        j++;
+
+        deletingDataForDrawing();
+        i=0;
         _floors.at(j)->getwalls().at(i)->generateHouseWalls(_vertices, _uvs);
 
         initializeAgain();
@@ -237,7 +239,6 @@ void House::keyPressEvent(QKeyEvent *event){
             return;
         j--;
         i=0;
-
         deletingDataForDrawing();
 
        _floors.at(j)->getwalls().at(i)->generateHouseWalls(_vertices, _uvs);

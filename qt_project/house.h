@@ -62,7 +62,7 @@ private:
 
     QVector<Floor*> _floors;
     QString str= "./k.bmp";
-    QVector<QString> tex={"./k.bmp", "./beige.jpg", "./window.bmp", "./d2.png"};
+    QVector<QString> tex={"/k.bmp", "/beige.jpg", "/window.bmp", "/d2.png"};
     float angle=0.0;
     float lx=0.0f,lz=-1.0f;
     float x=0.0f,z=0.0f, y=2.0f;

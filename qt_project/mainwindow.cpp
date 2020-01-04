@@ -102,10 +102,16 @@ void MainWindow::on_buttonWallsView_clicked(){
 }
 
 void MainWindow::on_buttonHouse_clicked(){
-    House *house= new House(this->drawingarea->getFloor());
 
+    QVector<Floor*> floors=this->drawingarea->getFloor();
 
-    house->show();
+    if(floors.size()>0){
+        House *house= new House(floors);
+        house->show();
+    }else{
+        QMessageBox::warning(this, tr("Upozorenje"),tr("Niste nacrtali ili niste sacuvali Vas rad"
+                                                       "Molim Vas sacuvajte Vas rad klikom na taster N"));
+    }
 
 
 }
