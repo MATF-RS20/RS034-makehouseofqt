@@ -27,12 +27,13 @@ private:
     float _thickness;
     QVector<GLfloat> uvs=
     {
-        0.4f, 0.4f,
-        0.4f, -0.4f,
+
         -0.4f, -0.4f,
         -0.4f, 0.4f,
+        0.4f, -0.4f,
+        0.4f, -0.4f,
+        -0.4f, 0.4f,
         0.4f, 0.4f,
-        -0.4f, -0.4f,
     };
 };
 

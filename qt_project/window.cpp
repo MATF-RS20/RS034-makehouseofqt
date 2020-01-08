@@ -27,12 +27,12 @@ QVector<GLfloat> Window::gwindow(){
     GLfloat p2x= (GLfloat) _windowline.p2().x()/c;
     GLfloat p2y= (GLfloat) _windowline.p2().y()/c;
     return {
-        p2x, (GLfloat) 2*_height, p2y,
-        p2x, _height, p2y,
         p1x, _height, p1y,
+        p2x, _height, p2y,
         p1x, (GLfloat) 2*_height, p1y,
+        p1x, (GLfloat) 2*_height, p1y,
+        p2x, _height, p2y,
         p2x, (GLfloat) 2*_height, p2y,
-        p1x, _height, p1y
     };
 }
 void Window::generateWindow(QVector<GLfloat> &vert, QVector<GLfloat> &uvss){

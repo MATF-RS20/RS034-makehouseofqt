@@ -92,12 +92,12 @@ QVector<GLfloat> Door::gdoor(){
     GLfloat p2x= (GLfloat) _doorline.p2().x()/c;
     GLfloat p2y= (GLfloat) _doorline.p2().y()/c;
     return {
-        p2x, (GLfloat) 2*_height, p2y,
-        p2x, 0, p2y,
         p1x, 0, p1y,
+        p2x, 0, p2y,
         p1x, (GLfloat) 2*_height, p1y,
+        p1x, (GLfloat) 2*_height, p1y,
+        p2x, 0, p2y,
         p2x, (GLfloat) 2*_height, p2y,
-        p1x, 0, p1y
     };
 }
 void Door::generateDoor(QVector<GLfloat> &vert, QVector<GLfloat> &uvss){

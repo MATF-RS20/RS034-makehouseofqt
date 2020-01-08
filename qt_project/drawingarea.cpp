@@ -75,6 +75,7 @@ void DrawingArea::paintEvent(QPaintEvent *event)
     //ako je pritisnuto dugme za zavrsetak nacrta iscta nam se konacan poligon
     if(polygon_is_complited)
     {
+
         if(polygonPoints.size()==3 && chosen_door){
 
 

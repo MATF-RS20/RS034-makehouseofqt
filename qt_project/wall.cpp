@@ -75,15 +75,10 @@ bool Wall::containsPoints(QLineF &l2){
         }
         QPointF p;
         if((p2.containsPoint(l2.p1(), Qt::FillRule()) || p2.containsPoint(l2.p2(), Qt::FillRule()))){
-
-
-
             return true;
         }
 
          if(l1.intersect(l2,&p)==QLineF::BoundedIntersection){
-
-
              return true;
          }
 
