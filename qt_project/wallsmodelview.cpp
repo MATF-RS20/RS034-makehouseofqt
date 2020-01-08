@@ -71,7 +71,8 @@ void WallsModelView::paintEvent(QPaintEvent *event)
 
     glViewport(0, 0, this->width(), this->height());
 
-    glClearColor(0.39f, 0.58f, 0.93f, 1.f);
+
+    glClearColor(0.2f, 0.58f, 0.93f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     vao->bind();

@@ -353,6 +353,7 @@ void DrawingArea::changeOnMouse()
 }
 void DrawingArea::reinit_floors(){
     walls_for_rooms.clear();
+    allPolys.clear();
 
 }
 void DrawingArea::keyPressEvent(QKeyEvent *e){
@@ -372,8 +373,8 @@ void DrawingArea::keyPressEvent(QKeyEvent *e){
 
     }else if(e->key()==Qt::Key_N){
         if(walls_for_rooms.size()>0){
-            floors.push_back(new Floor(walls_for_rooms));
-            walls_for_rooms.clear();
+            floors.push_back(new Floor(walls_for_rooms, allPolys));
+            reinit_floors();
             last_floor++;
             reinitialize();
         }else{
@@ -388,6 +389,7 @@ void DrawingArea::keyPressEvent(QKeyEvent *e){
             reinitialize();
             reinit_floors();
             walls_for_rooms=floors.at(last_floor)->getwalls();
+            allPolys= floors.at(last_floor)->getAllPolys();
             this->repaint();
         }else{
             QMessageBox::warning(this, tr("Upozorenje"),tr("Ova komanda radi samo kad "
@@ -408,6 +410,7 @@ void DrawingArea::keyPressEvent(QKeyEvent *e){
             reinitialize();
             reinit_floors();
             walls_for_rooms=floors.at(last_floor)->getwalls();
+            allPolys= floors.at(last_floor)->getAllPolys();
             this->repaint();
         }else{
             QMessageBox::warning(this, tr("Upozorenje"),tr("Ova komanda radi samo kad "
@@ -416,6 +419,7 @@ void DrawingArea::keyPressEvent(QKeyEvent *e){
     }else if(e->key()==Qt::Key_S){
         if(floors.size()>0){
             floors.at(last_floor)->setwalls(walls_for_rooms);
+            floors.at(last_floor)->setAllPolys(allPolys);
             this->repaint();
         }else{
 

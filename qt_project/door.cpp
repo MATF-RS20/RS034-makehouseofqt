@@ -27,16 +27,15 @@ void Door::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     float y2 = (_doorline.y2());
 
 
-
     if (abs(x1-x2) > abs(y1-y2) and y1 >= 300){
         if (x2 > x1){
-            QRectF rectangle(QPointF(x1-d, y1-60), QPointF(x2, y1+60));
+            QRectF rectangle(QPointF(x1-d, y1-90), QPointF(x2, y1+90));
 
             painter->drawPie(rectangle, _doorline.angle()*16, 90*16);
         }
         else{
            float d = (_doorline.x1()-_doorline.x2());
-           QRectF rectangle(QPointF(x2-d, y2-60), QPointF(x1, y2+60));
+           QRectF rectangle(QPointF(x2-d, y2-90), QPointF(x1, y2+90));
            QLineF line(QPointF(x2, y2), QPointF(x1, y1));
            float startangle = (line.angle());
            painter->drawPie(rectangle, startangle*16, 90*16);
@@ -45,13 +44,13 @@ void Door::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     }
     else if (abs(x1-x2) > abs(y1-y2) and y1 < 300){
         if (x2 < x1){
-            QRectF rectangle(QPointF(x1-d, y1-60), QPointF(x2, y1+60));
+            QRectF rectangle(QPointF(x1-d, y1-90), QPointF(x2, y1+90));
 
             painter->drawPie(rectangle, _doorline.angle()*16, 90*16);
         }
         else {
             float d =(_doorline.x1()-_doorline.x2());
-            QRectF rectangle(QPointF(x2-d, y2-60), QPointF(x1, y2+60));
+            QRectF rectangle(QPointF(x2-d, y2-90), QPointF(x1, y2+90));
             QLineF line(QPointF(x2, y2), QPointF(x1, y1));
             float startangle = (line.angle());
             painter->drawPie(rectangle, startangle*16, 90*16);
