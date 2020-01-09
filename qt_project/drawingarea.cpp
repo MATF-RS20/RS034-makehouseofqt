@@ -14,6 +14,7 @@ DrawingArea::DrawingArea(QWidget *parent)
     chosen_door=false;
     chosen_window=false;
     intersect_happened=false;
+    good_room=false;
     input_dialog=new InputDialog(this);
     wall_height=2.0;
     wall_thickness=0.25;
@@ -50,6 +51,40 @@ float DrawingArea::polygonArea(QPolygonF p, int n)
 
     // Vrati apsolutnu vrednost
     return abs((a-b) / 2000.00);
+}
+bool DrawingArea::canMakeRoom(){
+    //proveravamo orijentaciju 3 susedne tacke. Trouglovi moraju da budu iste orijentacije (npr. smer kazaljke na satu ili obrnuto)
+   int orientation;
+   auto point1 = polygonPoints[0], point2 = polygonPoints[polygonPoints.size()-2], point3 = polygonPoints[1];
+
+   if (((point2.x()-point1.x())*(point3.y()-point1.y()) - (point3.x()-point1.x())*(point2.y()-point1.y())) < 0)
+       orientation = -1;
+    else
+       orientation = 1;
+
+   good_room=true;
+
+    for(int i=1 ; i < polygonPoints.size()-2 ; i++){
+        int next_orientation;
+        point1 = polygonPoints[i]; point2 = polygonPoints[i-1]; point3 =polygonPoints[i+1];
+        if (((point2.x()-point1.x())*(point3.y()-point1.y()) - (point3.x()-point1.x())*(point2.y()-point1.y())) < 0)
+             next_orientation = -1;
+        else
+            next_orientation = 1;
+        if (orientation != next_orientation)
+            good_room=false;
+     }
+
+     int next_orientation;
+     point1 = polygonPoints[polygonPoints.size()-2]; point3 = polygonPoints[0]; point2 = polygonPoints[polygonPoints.size()-3];
+     if (((point2.x()-point1.x())*(point3.y()-point1.y()) - (point3.x()-point1.x())*(point2.y()-point1.y())) < 0)
+         next_orientation = -1;
+     else  next_orientation = 1;
+
+     if (orientation != next_orientation)
+         good_room=false;
+
+    return good_room;
 }
 void DrawingArea::paintEvent(QPaintEvent *event)
 {
@@ -120,7 +155,7 @@ void DrawingArea::paintEvent(QPaintEvent *event)
                   }
                 its.clear();
              }
-            if(!intersect_happened)
+            if(!intersect_happened && canMakeRoom())
                 walls_for_rooms.push_back(new Wall(*potential_wal, wall_height, wall_thickness));
             else
                 intersect_happened = false;
@@ -427,6 +462,16 @@ void DrawingArea::keyPressEvent(QKeyEvent *e){
             QMessageBox::warning(this, tr("Upozorenje"),tr("Ova komanda radi samo kad zelite da promenite "
                                                            "prethodni sprat. Da biste sacuvali i napravili novi sprat "
                                                            "pritisnite taster N"));
+        }
+    }else if(e->key()==Qt::Key_E)
+    {
+        if(allPolys.empty())
+            QMessageBox::warning(this, tr("Nemoguca radnja"), tr("Ne postoji soba za brisanje"));
+        else
+        {
+            allPolys.pop_back();
+            walls_for_rooms.pop_back();
+            this->repaint();
         }
     }
 

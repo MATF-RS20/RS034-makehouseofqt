@@ -80,6 +80,7 @@ private:
     bool chosen_window;
     bool chosen_door;
     bool intersect_happened;
+    bool good_room;
     QVector<QLineF>::Iterator ii;
     QVector<QPointF> polygonPoints;
     QVector<QLineF> lines;
@@ -100,6 +101,7 @@ private:
     void reinitialize();
     void reinit_floors();
     float polygonArea(QPolygonF p, int n);
+    bool canMakeRoom();
     bool isIntersect(QLineF line1, QLineF line2);
 
 };

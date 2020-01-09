@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent): QWidget(parent)
     drawingarea -> setWindowFlags(Qt::Window);
 
     buttonReset = new QPushButton;
-    buttonReset ->setText("Obrisi trenutno crtanje");
+    buttonReset ->setText("Obrisi zapoceto crtanje");
     buttonComplete = new QPushButton;
     buttonComplete ->setText("Zavrsi nacrt");
     statusBar = new QLabel("status");
