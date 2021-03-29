@@ -1,6 +1,6 @@
 #include "house.h"
 #include <QFileDialog>
-House::House(QVector<Floor*> floors):_floors(floors)
+House::House(QVector<Floor*> floors):_floors(std::move(floors))
 {
 
     this->setTitle("Setnja po kuci");
@@ -67,23 +67,23 @@ void House::initializeGL()
     QVector<GLfloat> vertices=
     {
 
-        -100.0f,0.0f,-100.0f,
-        100.0f,0.0f,-100.0f,
-        -100.0f,0.0f, 100.0f,
-        100.0f,0.0f,-100.0f,
-        100.0f,0.0f, 100.0f,
-        -100.0f,0.0f, 100.0f
+        -100.0F,0.0F,-100.0F,
+        100.0F,0.0F,-100.0F,
+        -100.0F,0.0F, 100.0F,
+        100.0F,0.0F,-100.0F,
+        100.0F,0.0F, 100.0F,
+        -100.0F,0.0F, 100.0F
 
 
     };
     QVector<GLfloat> uvs=
     {
-        -50.0f, -50.0f,
-        50.0f, -50.0f,
-        -50.0f, 50.0f,
-        50.0f, -50.0f,
-        50.0f, 50.0f,
-        -50.0f, 50.0f
+        -50.0F, -50.0F,
+        50.0F, -50.0F,
+        -50.0F, 50.0F,
+        50.0F, -50.0F,
+        50.0F, 50.0F,
+        -50.0F, 50.0F
 
     };
 
@@ -117,17 +117,19 @@ void House::paintEvent(QPaintEvent *event)
 
     glViewport(0, 0, this->width(), this->height());
 
-    glClearColor(0.39f, 0.58f, 0.93f, 1.f);
+    glClearColor(0.39F, 0.58F, 0.93F, 1.F);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     vao->bind();
     shaderProgram->bind();
 
 
     QMatrix4x4 matrixMVP;
-    QMatrix4x4 model, view, projection;
+    QMatrix4x4 model;
+    QMatrix4x4 view;
+    QMatrix4x4 projection;
     QPointF mid=_floors.at(j)->getwalls().at(i)->middleOfTheRoom()/20.0;
     view.lookAt(QVector3D(mid.x()+x, y, mid.y()+z), QVector3D(mid.x()+x+lx, y, mid.y()+z+lz), QVector3D(0, 1, 0));
-    projection.perspective(60.0f, ((float)this->width()/(float)this->height()), 0.1f, 100.0f);
+    projection.perspective(60.0F, ((float)this->width()/(float)this->height()), 0.1F, 100.0F);
     matrixMVP = projection * view * model;
     shaderProgram->setUniformValue("matrix", matrixMVP);
 
@@ -180,7 +182,7 @@ void House::resizeEvent(QResizeEvent *event)
     this->update();
 }
 void House::keyPressEvent(QKeyEvent *event){
-    float fraction = 0.5f; //bilo je 0.1f
+    float fraction = 0.5F; //bilo je 0.1f
 
     if(event->key()==Qt::Key_Up){
         x += lx * fraction;
@@ -189,11 +191,11 @@ void House::keyPressEvent(QKeyEvent *event){
         x -= lx * fraction;
         z -= lz * fraction;
     }else if(event->key()==Qt::Key_Left){
-        angle -= 0.05f;
+        angle -= 0.05F;
         lx = sin(angle);
         lz = -cos(angle);
     }else if(event->key()==Qt::Key_Right){
-        angle += 0.05f;
+        angle += 0.05F;
         lx = sin(angle);
         lz = -cos(angle);
     }else if(event->key()==Qt::Key_Space){
@@ -266,8 +268,8 @@ void House::initializeAgain(){
         _vbo_uvs.last()->allocate(_uvs.at(i).begin(), _uvs.at(i).size() * sizeof(GLfloat));
     }
     angle=0.0;
-    lx=0.0f,lz=-1.0f;
-    x=0.0f,z=0.0f, y=2.0f;
+    lx=0.0F,lz=-1.0F;
+    x=0.0F,z=0.0F, y=2.0F;
 }
 
 void House::changingTextures(int i){
@@ -285,9 +287,9 @@ void House::deletingDataForDrawing(){
         p.clear();
    for(auto p: _uvs)
        p.clear();
-   for(auto p: _vbo_vertices)
+   for(auto* p: _vbo_vertices)
        delete p;
-  for(auto p: _vbo_uvs)
+  for(auto* p: _vbo_uvs)
       delete p;
    _vertices.clear();
    _uvs.clear();

@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent): QWidget(parent)
     drawingarea-> setGeometry(0,0,600,500);
     drawingarea-> setBackgroundRole(QPalette::Base);
     drawingarea -> setAutoFillBackground(true);
-    drawingarea -> setMouseTracking(1);
+    drawingarea -> setMouseTracking(true);
     drawingarea -> setCursor(Qt::CrossCursor);
     drawingarea -> setWindowFlags(Qt::Window);
 
@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent): QWidget(parent)
 
     clicked=true;
 
-    QGridLayout *mainLayout = new QGridLayout;
+    auto *mainLayout = new QGridLayout;
 
     mainLayout->setColumnStretch(0, 1);
     mainLayout->setColumnStretch(3, 1);
@@ -43,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent): QWidget(parent)
     buttonWallsView->setEnabled(false);
     buttonHouse->setEnabled(false);
 
-    connect(this -> drawingarea, SIGNAL(have_points(int)), this, SLOT(setPointsnumber(int)),Qt::DirectConnection);
+    connect(this -> drawingarea, SIGNAL(have_points(int)), this, SLOT(setPointsnumber()),Qt::DirectConnection);
     connect(this->buttonReset, SIGNAL(clicked()), this ->drawingarea, SLOT(reset_drawing()), Qt::DirectConnection );
     connect(this->buttonReset, SIGNAL(clicked()), this, SLOT(reseting()));
     connect(this->buttonWallsView, SIGNAL(clicked(bool)), this, SLOT(on_buttonWallsView_clicked()));
@@ -75,7 +75,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent * e)
 }
 
 
-void MainWindow::setPointsnumber(int)
+void MainWindow::setPointsnumber()
 {
 this->buttonReset   ->setEnabled(true);
 this->buttonComplete->setEnabled(true);
@@ -91,22 +91,22 @@ void MainWindow::reseting()
 }
 
 void MainWindow::on_buttonWallsView_clicked(){
-    WallsModelView* wmv=new WallsModelView(drawingarea->getWall());
+    auto* wmv=new WallsModelView(drawingarea->getWall());
 
     if(clicked){
         wmv->show();
     }else{
         wmv->hide();
     }
-    clicked=!clicked && true;
+    clicked=!clicked;
 }
 
 void MainWindow::on_buttonHouse_clicked(){
 
     QVector<Floor*> floors=this->drawingarea->getFloor();
 
-    if(floors.size()>0){
-        House *house= new House(floors);
+    if(!floors.empty()){
+        auto *house= new House(floors);
         house->show();
     }else{
         QMessageBox::warning(this, tr("Upozorenje"),tr("Niste nacrtali ili niste sacuvali Vas rad"

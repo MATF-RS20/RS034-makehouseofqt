@@ -15,8 +15,8 @@ public:
 
     explicit InputDialog(QWidget *parent = 0);
     ~InputDialog();
-    float height();
-    float thickness();
+    float height() const;
+    float thickness() const;
 public slots:
 
     void accept();

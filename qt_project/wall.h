@@ -19,9 +19,9 @@ public:
 
     QPolygonF walls();
 
-    double height();
+    double height() const;
 
-    double thickness();
+    double thickness() const;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
@@ -39,15 +39,15 @@ public:
 
     void generateWallsForView(QVector<GLfloat> &vertices, QVector<GLfloat> &colors,QColor color);
 
-    QVector<GLfloat> wall(QPointF p1, QPointF p2, GLfloat c, GLfloat h);
+    static QVector<GLfloat> wall(QPointF p1, QPointF p2, GLfloat c, GLfloat h);
 
     void generateRoof(QVector<GLfloat> &vertices, QVector<GLfloat> &roof_color);
 
     QVector<GLfloat> roof(QPointF p1, QPointF p2);
 
-    bool angle_is_wrong(QLineF l1, QLineF l2);
+    static bool angle_is_wrong(QLineF l1, QLineF l2);
 
-    bool isIntersect(QLineF line1, QLineF line2);
+    static bool isIntersect(QLineF line1, QLineF line2);
 
     void generateHouseWalls(QVector<QVector<GLfloat>> &vert, QVector<QVector<GLfloat>> &uvss);
 
@@ -65,12 +65,12 @@ private:
     float _thickness;
     QVector<GLfloat> uvs=
     {
-        5.0f, 5.0f,
-        5.0f, -5.0f,
-        -5.0f, -5.0f,
-        -5.0f, 5.0f,
-        5.0f, 5.0f,
-        -5.0f, -5.0f,
+        5.0F, 5.0F,
+        5.0F, -5.0F,
+        -5.0F, -5.0F,
+        -5.0F, 5.0F,
+        5.0F, 5.0F,
+        -5.0F, -5.0F,
     };
 
 };
