@@ -4,12 +4,12 @@ project(makeHouseOfQt, VERSION 1.0.0)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 
+
 set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-checks=modernize-*,-modernize-use-trailing-return-type,-modernize-use-nodiscard,readability-*,-readability-braces-around-statements,-readability-magic-numbers,-readability-else-after-return,-clang-analyzer-optin.*")
 
 if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
-
 
 
 find_package(Qt5 COMPONENTS Widgets OpenGL REQUIRED)
