@@ -100,9 +100,9 @@ private:
     int last_floor;
     void reinitialize();
     void reinit_floors();
-    float polygonArea(QPolygonF p, int n);
+    static float polygonArea(QPolygonF p, int n);
     bool canMakeRoom();
-    bool isIntersect(QLineF line1, QLineF line2);
+    static bool isIntersect(QLineF line1, QLineF line2);
 
 };
 

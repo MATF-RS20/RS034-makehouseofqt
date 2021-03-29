@@ -37,7 +37,7 @@ signals:
 
 public slots:
 
-    void setPointsnumber(int);
+    void setPointsnumber();
 
 
 signals:

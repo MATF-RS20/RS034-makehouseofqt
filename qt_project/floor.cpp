@@ -1,7 +1,7 @@
 #include "floor.h"
 
 Floor::Floor(QVector<Wall*> walls, QList<QPolygonF> allPolys):
-    _walls(walls),_allPolys(allPolys)
+    _walls(std::move(walls)),_allPolys(std::move(allPolys))
 {
 
 }

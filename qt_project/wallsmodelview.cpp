@@ -1,5 +1,5 @@
 #include "wallsmodelview.h"
-WallsModelView::WallsModelView(QVector<Wall*> walls):_walls(walls)
+WallsModelView::WallsModelView(QVector<Wall*> walls):_walls(std::move(walls))
 {
     this->setTitle("3D prikaza Kuce");
     setSurfaceType(QWindow::OpenGLSurface);
@@ -66,13 +66,13 @@ void WallsModelView::paintEvent(QPaintEvent *event)
     Q_UNUSED(event);
 
     currentTime = time->elapsed();
-    deltaTime = (float)(currentTime - oldTime) / 1000.0f;
+    deltaTime = (float)(currentTime - oldTime) / 1000.0F;
     oldTime = currentTime;
 
     glViewport(0, 0, this->width(), this->height());
 
 
-    glClearColor(0.2f, 0.58f, 0.93f, 1.f);
+    glClearColor(0.2F, 0.58F, 0.93F, 1.F);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     vao->bind();
@@ -82,14 +82,16 @@ void WallsModelView::paintEvent(QPaintEvent *event)
 
 
     QMatrix4x4 matrixMVP;
-    QMatrix4x4 model, view, projection;
+    QMatrix4x4 model;
+    QMatrix4x4 view;
+    QMatrix4x4 projection;
     model.translate(0, 0.5, 0);
 
     model.rotate(rotationX, 1, 0, 0);
     model.rotate(rotationY, 0, 1, 0);
     model.rotate(rotationZ,0, 0, 1);
     view.lookAt(QVector3D(5+sin(rotation), 5, 5+(-cos(rotation))), QVector3D(0, 0, 0), QVector3D(0, 1, 0));
-    projection.perspective(60.0f, ((float)this->width()/(float)this->height()), 0.1f, 100.0f);
+    projection.perspective(60.0F, ((float)this->width()/(float)this->height()), 0.1F, 100.0F);
     matrixMVP = projection * view * model;
     shaderProgram->setUniformValue("matrix", matrixMVP);
 
@@ -201,7 +203,7 @@ void WallsModelView::initialize_vbos(){
 
 void WallsModelView::keyPressEvent(QKeyEvent *event){
     if(event->key()==Qt::Key_R){
-        selected=!selected && true;
+        selected=!selected;
     }
 }
 

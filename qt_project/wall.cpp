@@ -1,7 +1,7 @@
 #include "wall.h"
 #include <QString>
 Wall::Wall(QPolygonF walls_of_rooms, double height, double thickness):
-    _walls_of_rooms(walls_of_rooms),_height(height),_thickness(thickness)
+    _walls_of_rooms(std::move(walls_of_rooms)),_height(std::move(height)),_thickness(std::move(thickness))
 {
 
 }
@@ -10,11 +10,11 @@ QPolygonF Wall::walls(){
     return _walls_of_rooms;
 }
 
-double Wall::height(){
+double Wall::height() const{
     return _height;
 }
 
-double Wall::thickness(){
+double Wall::thickness() const{
     return _thickness;
 }
 
@@ -27,13 +27,13 @@ void Wall::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     painter->setPen(pen);
     painter->drawPolygon(_walls_of_rooms);
 
-    for(auto w: _decorative_wall)
+    for(auto* w: _decorative_wall)
         w->paint(painter, Q_NULLPTR, Q_NULLPTR);
 
-    for(auto w: _windows)
+    for(auto* w: _windows)
         w->paint(painter, Q_NULLPTR, Q_NULLPTR);
 
-    for(auto d: _doors)
+    for(auto* d: _doors)
         d->paint(painter, Q_NULLPTR, Q_NULLPTR);
 }
 
@@ -56,8 +56,8 @@ QVector<Door*> Wall::getDoors(){
 bool Wall::containsPoints(QLineF &l2){
 
 
-    auto start= _walls_of_rooms.begin();
-    auto end= _walls_of_rooms.end();
+    auto* start= _walls_of_rooms.begin();
+    auto* end= _walls_of_rooms.end();
 
 
 
@@ -90,8 +90,8 @@ bool Wall::containsPoints(QLineF &l2){
         start++;
     }
 
-    auto decstart= _decorative_wall.begin();
-    auto decend= _decorative_wall.end();
+    auto* decstart= _decorative_wall.begin();
+    auto* decend= _decorative_wall.end();
     while(decstart!=decend){
         if((*decstart)->containsPoints(l2))
             return true;
@@ -101,7 +101,8 @@ bool Wall::containsPoints(QLineF &l2){
 }
 
 QPointF Wall::middleOfTheRoom(){
-    float x=0, y=0;
+    float x=0;
+    float y=0;
     for (QPointF p: _walls_of_rooms){
         x+=p.x();
         y+=p.y();
@@ -128,8 +129,8 @@ QVector<GLfloat> Wall::wall(QPointF p1, QPointF p2, GLfloat c, float h){
 }
 void Wall::generateWallsForView(QVector<GLfloat> &vertices, QVector<GLfloat> &colors, QColor color){
 
-    auto start= _walls_of_rooms.begin();
-    auto end= _walls_of_rooms.end()-1;
+    auto* start= _walls_of_rooms.begin();
+    auto* end= _walls_of_rooms.end()-1;
     while( start != end){
         QVector<GLfloat> array= wall(*start, *(start+1), 200.0, _height/2);
 
@@ -145,8 +146,8 @@ void Wall::generateWallsForView(QVector<GLfloat> &vertices, QVector<GLfloat> &co
         start++;
     }
 
-    auto decstart=_decorative_wall.begin();
-    auto decend= _decorative_wall.end();
+    auto* decstart=_decorative_wall.begin();
+    auto* decend= _decorative_wall.end();
     while(decstart != decend){
         (*decstart)->generateWallsForView(vertices, colors, color);
         decstart++;
@@ -169,8 +170,8 @@ QVector<GLfloat> Wall::roof(QPointF p1, QPointF p2){
     };
 }
 void Wall::generateRoof(QVector<GLfloat> &vertices, QVector<GLfloat> &roof_color){
-     auto start = _walls_of_rooms.begin();
-     auto end = _walls_of_rooms.end()-1;
+     auto* start = _walls_of_rooms.begin();
+     auto* end = _walls_of_rooms.end()-1;
 
      while(start!=end){
          QVector<GLfloat> array = roof(*start, *(start+1));
@@ -194,7 +195,18 @@ bool Wall::angle_is_wrong(QLineF l1, QLineF l2){
 
 bool Wall::isIntersect(QLineF line1, QLineF line2)
 {
-    double a1,a2,a3,a4; double x11,y11,x12,y12, x21, y21,x22,y22;
+    double a1;
+    double a2;
+    double a3;
+    double a4;
+    double x11;
+    double y11;
+    double x12;
+    double y12;
+    double x21;
+    double y21;
+    double x22;
+    double y22;
     x11 = line1.p1().x(); y11 = line1.p1().y();
     x12 = line1.p2().x(); y12 = line1.p2().y();
     x21 = line2.p1().x(); y21 = line2.p1().y();
@@ -210,9 +222,10 @@ bool Wall::isIntersect(QLineF line1, QLineF line2)
 }
 
 void Wall::generateHouseWalls(QVector<QVector<GLfloat> > &vert, QVector<QVector<GLfloat> > &uvss){
-    auto startw= _walls_of_rooms.begin();
-    auto endw = _walls_of_rooms.end()-1;
-    QVector<GLfloat> v,  u;
+    auto* startw= _walls_of_rooms.begin();
+    auto* endw = _walls_of_rooms.end()-1;
+    QVector<GLfloat> v;
+    QVector<GLfloat> u;
     while(startw!= endw){
         QVector<GLfloat> wallie=wall(*startw, *(startw+1), 20.0, 3*_height);
         for(auto nzu: wallie)
@@ -223,8 +236,8 @@ void Wall::generateHouseWalls(QVector<QVector<GLfloat> > &vert, QVector<QVector<
         startw++;
     }
 
-    auto decstart=_decorative_wall.begin();
-    auto decend= _decorative_wall.end();
+    auto* decstart=_decorative_wall.begin();
+    auto* decend= _decorative_wall.end();
     while(decstart != decend){
         QVector<GLfloat> wallie= wall((*decstart)->walls()[0],(*decstart)->walls()[1], 20.0, 3*_height);
         for(auto nzu: wallie)
@@ -242,8 +255,8 @@ void Wall::generateHouseWalls(QVector<QVector<GLfloat> > &vert, QVector<QVector<
     v.clear();
     u.clear();
 
-    auto startwd= _windows.begin();
-    auto endwd= _windows.end();
+    auto* startwd= _windows.begin();
+    auto* endwd= _windows.end();
 
     if(startwd!=endwd){
         while(startwd!=endwd){
@@ -270,8 +283,8 @@ void Wall::generateHouseWalls(QVector<QVector<GLfloat> > &vert, QVector<QVector<
     v.clear();
     u.clear();
 
-    auto startd= _doors.begin();
-    auto endd= _doors.end();
+    auto* startd= _doors.begin();
+    auto* endd= _doors.end();
 
     if(startd!=endd){
         while(startd!=endd){
@@ -300,8 +313,8 @@ void Wall::generateHouseWalls(QVector<QVector<GLfloat> > &vert, QVector<QVector<
 bool Wall::canMakeDecorativeWall(QVector<QPointF> line){
 
 
-    auto start= _walls_of_rooms.begin();
-    auto end= _walls_of_rooms.end();
+    auto* start= _walls_of_rooms.begin();
+    auto* end= _walls_of_rooms.end();
 
 
     auto l2=QLineF(line[0], line[1]);

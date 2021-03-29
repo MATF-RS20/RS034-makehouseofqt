@@ -41,7 +41,8 @@ DrawingArea::DrawingArea(QWidget *parent)
 float DrawingArea::polygonArea(QPolygonF p, int n)
 {
 
-    int a = 0, b = 0;
+    int a = 0;
+    int b = 0;
     for (int i = 0; i < n-1; i++)
     {
         a += (p.value(i).rx()) * (p.value(i+1).ry());
@@ -55,11 +56,13 @@ float DrawingArea::polygonArea(QPolygonF p, int n)
 bool DrawingArea::canMakeRoom(){
     //proveravamo orijentaciju 3 susedne tacke. Trouglovi moraju da budu iste orijentacije (npr. smer kazaljke na satu ili obrnuto)
    int orientation;
-   auto point1 = polygonPoints[0], point2 = polygonPoints[polygonPoints.size()-2], point3 = polygonPoints[1];
+   auto point1 = polygonPoints[0];
+   auto point2 = polygonPoints[polygonPoints.size()-2];
+   auto point3 = polygonPoints[1];
 
    if (((point2.x()-point1.x())*(point3.y()-point1.y()) - (point3.x()-point1.x())*(point2.y()-point1.y())) < 0)
        orientation = -1;
-    else
+   else
        orientation = 1;
 
    good_room=true;
@@ -138,7 +141,7 @@ void DrawingArea::paintEvent(QPaintEvent *event)
         }
         else if(polygonPoints.size()>4){
             //proveravamo da li se ovaj zid kosi sa ostalima u nizu
-            QPolygonF* potential_wal = new QPolygonF(polygonPoints);
+            auto* potential_wal = new QPolygonF(polygonPoints);
             allPolys.append(*potential_wal);
             for(int i = 0; i < allPolys.size(); i++)
             {
@@ -334,14 +337,25 @@ void DrawingArea::enterEvent(QMouseEvent * e)
 
 QSize DrawingArea::sizeHint() const
 {
-    return QSize(620, 460);
+    return QSize{620, 460};
 }
 
 
 
 bool DrawingArea::isIntersect(QLineF line1, QLineF line2)
 {
-    double a1,a2,a3,a4; double x11,y11,x12,y12, x21, y21,x22,y22;
+    double a1;
+    double a2;
+    double a3;
+    double a4;
+    double x11;
+    double y11;
+    double x12;
+    double y12;
+    double x21;
+    double y21;
+    double x22;
+    double y22;
     x11 = line1.p1().x(); y11 = line1.p1().y();
     x12 = line1.p2().x(); y12 = line1.p2().y();
     x21 = line2.p1().x(); y21 = line2.p1().y();
@@ -408,7 +422,7 @@ void DrawingArea::keyPressEvent(QKeyEvent *e){
         this->repaint();
 
     }else if(e->key()==Qt::Key_N){
-        if(walls_for_rooms.size()>0){
+        if(!walls_for_rooms.empty()){
             floors.push_back(new Floor(walls_for_rooms, allPolys));
             reinit_floors();
             last_floor++;
@@ -418,7 +432,7 @@ void DrawingArea::keyPressEvent(QKeyEvent *e){
                                                            "Molim Vas nacrtajte."));
         }
     }else if(e->key()==Qt::Key_B){
-        if(floors.size()>0){
+        if(!floors.empty()){
             if(last_floor-1<0)
                 return;
             last_floor--;
@@ -432,7 +446,7 @@ void DrawingArea::keyPressEvent(QKeyEvent *e){
                                                            "imate na raspolaganju vise spratova"));
         }
     }else if(e->key()==Qt::Key_F){
-        if(floors.size()>0){
+        if(!floors.empty()){
             if(last_floor+1>floors.size())
                 return;
             if(last_floor+1==floors.size()){
@@ -453,7 +467,7 @@ void DrawingArea::keyPressEvent(QKeyEvent *e){
                                                            "imate na raspolaganju vise spratova"));
         }
     }else if(e->key()==Qt::Key_S){
-        if(floors.size()>0){
+        if(!floors.empty()){
             floors.at(last_floor)->setwalls(walls_for_rooms);
             floors.at(last_floor)->setAllPolys(allPolys);
             this->repaint();

@@ -21,10 +21,10 @@ void InputDialog::accept(){
     this->close();
 }
 
-float InputDialog::height(){
+float InputDialog::height() const{
     return _height;
 }
 
-float InputDialog::thickness(){
+float InputDialog::thickness()  const{
     return _thickness;
 }
