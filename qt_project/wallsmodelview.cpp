@@ -1,209 +1,205 @@
 #include "wallsmodelview.h"
-WallsModelView::WallsModelView(QVector<Wall*> walls):_walls(std::move(walls))
-{
-    this->setTitle("3D prikaza Kuce");
-    setSurfaceType(QWindow::OpenGLSurface);
+WallsModelView::WallsModelView(QVector<Wall *> walls)
+    : _walls(std::move(walls)) {
+  this->setTitle("3D prikaza Kuce");
+  setSurfaceType(QWindow::OpenGLSurface);
 
-    QSurfaceFormat format;
-    format.setProfile(QSurfaceFormat::CoreProfile);
-    format.setVersion(3, 2);
-    setFormat(format);
+  QSurfaceFormat format;
+  format.setProfile(QSurfaceFormat::CoreProfile);
+  format.setVersion(3, 2);
+  setFormat(format);
 
-    openGLContext = new QOpenGLContext();
-    openGLContext->setFormat(format);
-    openGLContext->create();
-    openGLContext->makeCurrent(this);
+  openGLContext = new QOpenGLContext();
+  openGLContext->setFormat(format);
+  openGLContext->create();
+  openGLContext->makeCurrent(this);
 
-    time = new QTime();
-    time->start();
+  time = new QTime();
+  time->start();
 }
 
-void WallsModelView::initializeGL()
-{
-    openGLFunctions = openGLContext->functions();
-    glEnable(GL_DEPTH_TEST);
+void WallsModelView::initializeGL() {
+  openGLFunctions = openGLContext->functions();
+  glEnable(GL_DEPTH_TEST);
 
-    _color= QColor(Qt::white);
-    static const char *vertexShaderSource =
-    "#version 330 core\n"
-    "layout(location = 0) in vec3 posAttr;\n"
-    "layout(location = 1) in vec3 colAttr;\n"
-    "uniform mat4 matrix;\n"
-    "out vec3 fragCol;\n"
-    "void main() {\n"
-    "fragCol = colAttr;\n"
-    "gl_Position = matrix * vec4(posAttr, 1.0); }";
+  _color = QColor(Qt::white);
+  static const char *vertexShaderSource =
+      "#version 330 core\n"
+      "layout(location = 0) in vec3 posAttr;\n"
+      "layout(location = 1) in vec3 colAttr;\n"
+      "uniform mat4 matrix;\n"
+      "out vec3 fragCol;\n"
+      "void main() {\n"
+      "fragCol = colAttr;\n"
+      "gl_Position = matrix * vec4(posAttr, 1.0); }";
 
-    static const char *fragmentShaderSource =
-    "#version 330 core\n"
-    "in vec3 fragCol;\n"
-    "out vec4 col;\n"
-    "void main() {\n"
-    "col = vec4(fragCol, 1.0); }";
+  static const char *fragmentShaderSource = "#version 330 core\n"
+                                            "in vec3 fragCol;\n"
+                                            "out vec4 col;\n"
+                                            "void main() {\n"
+                                            "col = vec4(fragCol, 1.0); }";
 
-    shaderProgram = new QOpenGLShaderProgram(this);
-    shaderProgram->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderSource);
-    shaderProgram->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource);
-    shaderProgram->link();
+  shaderProgram = new QOpenGLShaderProgram(this);
+  shaderProgram->addShaderFromSourceCode(QOpenGLShader::Vertex,
+                                         vertexShaderSource);
+  shaderProgram->addShaderFromSourceCode(QOpenGLShader::Fragment,
+                                         fragmentShaderSource);
+  shaderProgram->link();
 
+  for (Wall *w : _walls) {
+    w->generateWallsForView(vertices, colors, _color);
+    w->generateRoof(roof_vertices, roof_colors);
+  }
 
-    for(Wall *w: _walls){
-        w->generateWallsForView(vertices, colors, _color);
-        w->generateRoof(roof_vertices, roof_colors);
-    }
+  vao = new QOpenGLVertexArrayObject();
+  vao->create();
+  vao->bind();
 
-    vao = new QOpenGLVertexArrayObject();
-    vao->create();
-    vao->bind();
+  initialize_vbos();
 
-    initialize_vbos();
-
-    vao->release();
+  vao->release();
 }
 
-void WallsModelView::paintEvent(QPaintEvent *event)
-{
-    Q_UNUSED(event);
+void WallsModelView::paintEvent(QPaintEvent *event) {
+  Q_UNUSED(event);
 
-    currentTime = time->elapsed();
-    deltaTime = (float)(currentTime - oldTime) / 1000.0F;
-    oldTime = currentTime;
+  currentTime = time->elapsed();
+  deltaTime = (float)(currentTime - oldTime) / 1000.0F;
+  oldTime = currentTime;
 
-    glViewport(0, 0, this->width(), this->height());
+  glViewport(0, 0, this->width(), this->height());
 
+  glClearColor(0.2F, 0.58F, 0.93F, 1.F);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glClearColor(0.2F, 0.58F, 0.93F, 1.F);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  vao->bind();
+  shaderProgram->bind();
 
-    vao->bind();
-    shaderProgram->bind();
+  rotation += deltaTime;
 
-    rotation += deltaTime ;
+  QMatrix4x4 matrixMVP;
+  QMatrix4x4 model;
+  QMatrix4x4 view;
+  QMatrix4x4 projection;
+  model.translate(0, 0.5, 0);
 
+  model.rotate(rotationX, 1, 0, 0);
+  model.rotate(rotationY, 0, 1, 0);
+  model.rotate(rotationZ, 0, 0, 1);
+  view.lookAt(QVector3D(5 + sin(rotation), 5, 5 + (-cos(rotation))),
+              QVector3D(0, 0, 0), QVector3D(0, 1, 0));
+  projection.perspective(60.0F, ((float)this->width() / (float)this->height()),
+                         0.1F, 100.0F);
+  matrixMVP = projection * view * model;
+  shaderProgram->setUniformValue("matrix", matrixMVP);
 
-    QMatrix4x4 matrixMVP;
-    QMatrix4x4 model;
-    QMatrix4x4 view;
-    QMatrix4x4 projection;
-    model.translate(0, 0.5, 0);
+  vbo_vertices->bind();
+  shaderProgram->bindAttributeLocation("posAttr", 0);
+  shaderProgram->enableAttributeArray(0);
+  shaderProgram->setAttributeBuffer(0, GL_FLOAT, 0, 3);
 
-    model.rotate(rotationX, 1, 0, 0);
-    model.rotate(rotationY, 0, 1, 0);
-    model.rotate(rotationZ,0, 0, 1);
-    view.lookAt(QVector3D(5+sin(rotation), 5, 5+(-cos(rotation))), QVector3D(0, 0, 0), QVector3D(0, 1, 0));
-    projection.perspective(60.0F, ((float)this->width()/(float)this->height()), 0.1F, 100.0F);
-    matrixMVP = projection * view * model;
-    shaderProgram->setUniformValue("matrix", matrixMVP);
+  vbo_colors->bind();
+  shaderProgram->bindAttributeLocation("colAttr", 1);
+  shaderProgram->enableAttributeArray(1);
+  shaderProgram->setAttributeBuffer(1, GL_FLOAT, 0, 3);
 
-    vbo_vertices->bind();
+  glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+
+  if (selected) {
+    vbo_roof_vertices->bind();
     shaderProgram->bindAttributeLocation("posAttr", 0);
     shaderProgram->enableAttributeArray(0);
     shaderProgram->setAttributeBuffer(0, GL_FLOAT, 0, 3);
 
-    vbo_colors->bind();
+    vbo_roof_colors->bind();
     shaderProgram->bindAttributeLocation("colAttr", 1);
     shaderProgram->enableAttributeArray(1);
     shaderProgram->setAttributeBuffer(1, GL_FLOAT, 0, 3);
 
-    glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+    glDrawArrays(GL_TRIANGLES, 0, roof_vertices.size());
+  }
+  shaderProgram->release();
+  vao->release();
 
-    if(selected){
-        vbo_roof_vertices->bind();
-        shaderProgram->bindAttributeLocation("posAttr", 0);
-        shaderProgram->enableAttributeArray(0);
-        shaderProgram->setAttributeBuffer(0, GL_FLOAT, 0, 3);
+  this->update();
+}
 
-        vbo_roof_colors->bind();
-        shaderProgram->bindAttributeLocation("colAttr", 1);
-        shaderProgram->enableAttributeArray(1);
-        shaderProgram->setAttributeBuffer(1, GL_FLOAT, 0, 3);
+void WallsModelView::resizeEvent(QResizeEvent *event) {
+  Q_UNUSED(event);
 
-        glDrawArrays(GL_TRIANGLES, 0, roof_vertices.size());
+  glViewport(0, 0, this->width(), this->height());
+  this->update();
+}
 
-    }
-    shaderProgram->release();
-    vao->release();
+void WallsModelView::mouseDoubleClickEvent(QMouseEvent *event) {
+  Q_UNUSED(event);
+  QColor color = QColorDialog::getColor();
 
+  if (color.isValid())
+    _color = color;
+
+  vertices.clear();
+  colors.clear();
+
+  for (Wall *w : _walls)
+    w->generateWallsForView(vertices, colors, _color);
+
+  initialize_vbos();
+
+  this->update();
+}
+
+void WallsModelView::mousePressEvent(QMouseEvent *event) {
+  lastPos = event->pos();
+}
+
+void WallsModelView::mouseMoveEvent(QMouseEvent *event) {
+  GLfloat dx = (GLfloat)(event->x() - lastPos.x()) / width();
+  GLfloat dy = (GLfloat)(event->y() - lastPos.y()) / height();
+
+  if (event->buttons() == Qt::LeftButton) {
+    rotationX += 180 * dy;
+    rotationY += 180 * dx;
     this->update();
-}
-
-void WallsModelView::resizeEvent(QResizeEvent *event)
-{
-    Q_UNUSED(event);
-
-    glViewport(0, 0, this->width(), this->height());
+  } else if (event->buttons() == Qt::RightButton) {
+    rotationX += 180 * dy;
+    rotationZ += 180 * dx;
     this->update();
+  }
+  lastPos = event->pos();
 }
 
-void WallsModelView::mouseDoubleClickEvent(QMouseEvent *event){
-    Q_UNUSED(event);
-    QColor color= QColorDialog::getColor();
+void WallsModelView::initialize_vbos() {
 
-    if(color.isValid())
-        _color=color;
+  vbo_vertices = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+  vbo_vertices->create();
+  vbo_vertices->setUsagePattern(QOpenGLBuffer::StaticDraw);
+  vbo_vertices->bind();
+  vbo_vertices->allocate(vertices.begin(), vertices.size() * sizeof(GLfloat));
 
-    vertices.clear();
-    colors.clear();
+  vbo_colors = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+  vbo_colors->create();
+  vbo_colors->setUsagePattern(QOpenGLBuffer::StaticDraw);
+  vbo_colors->bind();
+  vbo_colors->allocate(colors.begin(), colors.size() * sizeof(GLfloat));
 
-    for(Wall* w: _walls)
-        w->generateWallsForView(vertices, colors, _color);
+  vbo_roof_vertices = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+  vbo_roof_vertices->create();
+  vbo_roof_vertices->setUsagePattern(QOpenGLBuffer::StaticDraw);
+  vbo_roof_vertices->bind();
+  vbo_roof_vertices->allocate(roof_vertices.begin(),
+                              roof_vertices.size() * sizeof(GLfloat));
 
-    initialize_vbos();
-
-    this->update();
+  vbo_roof_colors = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+  vbo_roof_colors->create();
+  vbo_roof_colors->setUsagePattern(QOpenGLBuffer::StaticDraw);
+  vbo_roof_colors->bind();
+  vbo_roof_colors->allocate(roof_colors.begin(),
+                            roof_colors.size() * sizeof(GLfloat));
 }
 
-void WallsModelView::mousePressEvent(QMouseEvent *event){
-    lastPos=event->pos();
+void WallsModelView::keyPressEvent(QKeyEvent *event) {
+  if (event->key() == Qt::Key_R) {
+    selected = !selected;
+  }
 }
-
-void WallsModelView::mouseMoveEvent(QMouseEvent *event){
-    GLfloat dx= (GLfloat) (event->x() - lastPos.x()) / width();
-    GLfloat dy= (GLfloat) (event->y() - lastPos.y()) / height();
-
-    if(event->buttons()==Qt::LeftButton){
-        rotationX +=180*dy;
-        rotationY += 180*dx;
-        this->update();
-    }else if(event->buttons()==Qt::RightButton){
-        rotationX +=180*dy;
-        rotationZ += 180*dx;
-        this->update();
-    }
-    lastPos= event->pos();
-}
-
-void WallsModelView::initialize_vbos(){
-
-    vbo_vertices = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
-    vbo_vertices->create();
-    vbo_vertices->setUsagePattern(QOpenGLBuffer::StaticDraw);
-    vbo_vertices->bind();
-    vbo_vertices->allocate(vertices.begin(), vertices.size() * sizeof(GLfloat));
-
-    vbo_colors = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
-    vbo_colors->create();
-    vbo_colors->setUsagePattern(QOpenGLBuffer::StaticDraw);
-    vbo_colors->bind();
-    vbo_colors->allocate(colors.begin(), colors.size() * sizeof(GLfloat));
-
-    vbo_roof_vertices = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
-    vbo_roof_vertices->create();
-    vbo_roof_vertices->setUsagePattern(QOpenGLBuffer::StaticDraw);
-    vbo_roof_vertices->bind();
-    vbo_roof_vertices->allocate(roof_vertices.begin(), roof_vertices.size() * sizeof(GLfloat));
-
-    vbo_roof_colors = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
-    vbo_roof_colors->create();
-    vbo_roof_colors->setUsagePattern(QOpenGLBuffer::StaticDraw);
-    vbo_roof_colors->bind();
-    vbo_roof_colors->allocate(roof_colors.begin(), roof_colors.size() * sizeof(GLfloat));
-
-}
-
-void WallsModelView::keyPressEvent(QKeyEvent *event){
-    if(event->key()==Qt::Key_R){
-        selected=!selected;
-    }
-}
-
