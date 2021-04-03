@@ -1,41 +1,31 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <QLineF>
-#include <QGraphicsLineItem>
 #include <QColor>
-#include <QPen>
-#include <QPainter>
+#include <QGraphicsLineItem>
+#include <QLineF>
 #include <QOpenGLWindow>
-class Window: public QGraphicsLineItem
-{
+#include <QPainter>
+#include <QPen>
+class Window : public QGraphicsLineItem {
 public:
+  Window(QLineF windowline, float height = 2, float thickness = 0.25);
+  QLineF window();
 
-    Window(QLineF windowline, float height=2, float thickness=0.25);
-        QLineF window();
+  void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+             QWidget *widget);
 
+  QVector<GLfloat> gwindow();
 
-     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
-     QVector<GLfloat> gwindow();
-
-     void generateWindow(QVector<GLfloat> &vert, QVector<GLfloat> &uvss);
-
+  void generateWindow(QVector<GLfloat> &vert, QVector<GLfloat> &uvss);
 
 private:
-
-    QLineF _windowline;
-    float _height;
-    float _thickness;
-    QVector<GLfloat> uvs=
-    {
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        0.0f, 1.0f,
-        0.0f, 1.0f,
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-    };
+  QLineF _windowline;
+  float _height;
+  float _thickness;
+  QVector<GLfloat> uvs = {
+      0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+  };
 };
 
 #endif // WINDOW_H
